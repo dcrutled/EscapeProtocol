@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <SFML/Graphics.hpp>
 using namespace std;
 
 
@@ -63,6 +64,7 @@ GameSpace::GameSpace(int ringCount) {   //gamespace constructor
     int vertices = points.size();
     set_vertices(vertices);
     createEdges();
+    drawMap();
    
 
 }
@@ -163,12 +165,16 @@ void GameSpace::createPointsAndRings(int ringCount) {
         }
 
 
-    } //END OF FOR LOOP FOR POINT CREATION ----------------- UNCOMMENT BLOCK BELOW IF YOU WANT TO CHECK INDIVIDUAL POINT COORDINATES
-/*
-    for (int i = 0; i < size(points); i++) {
-        cout << points[i].name << "   (" << points[i].radius << ", " << points[i].theta << ")" << endl;
     }
-*/
+    
+    makeCartesian();
+    
+    //END OF FOR LOOP FOR POINT CREATION ----------------- UNCOMMENT BLOCK BELOW IF YOU WANT TO CHECK INDIVIDUAL POINT COORDINATES
+
+    for (int i = 0; i < size(points); i++) {
+        cout << points[i].name << "   (" << points[i].xcoord << ", " << points[i].ycoord << ")" << endl;
+    }
+
 
 }
 
@@ -357,3 +363,58 @@ void createGameSpaceGraph(int rings) {
 
 }
 */
+
+//----------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------
+
+
+
+void GameSpace::makeCartesian() {
+
+    for (int i = 0; i < points.size(); i++) {
+        points[i].xcoord = (points[i].radius * cos(points[i].theta)) * 100; //+ 960;
+        points[i].ycoord = (points[i].radius * sin(points[i].theta)) * 100; //+ 540;
+    }
+
+
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------
+
+
+void GameSpace::drawMap() {
+
+    
+    map = sf::VertexArray(sf::PrimitiveType::Lines);
+
+    for (int i = 0; i < edges.size(); i++)
+    {
+        for (int k = 0; k < edges[i].size(); k++) {
+
+            sf::Vertex v1;
+            sf::Vertex v2;
+
+            v1.position = sf::Vector2f(points[i].xcoord, points[i].ycoord);
+            v2.position = sf::Vector2f(points[edges[i][k]].xcoord, points[edges[i][k]].ycoord);
+
+
+            map.append(v1);
+            map.append(v2);
+        }
+    }
+
+    
+}
+
+
+
+
+void GameSpace::draw(sf::RenderWindow& window)
+{
+    window.draw(map);
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------

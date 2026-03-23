@@ -2,6 +2,7 @@
 #define GAMESPACE_H
 #include <string>
 #include <vector>
+#include <SFML/Graphics.hpp>
 
 using namespace std;
 
@@ -10,6 +11,8 @@ struct Point {
     int position;
     int radius = 0;
     float theta = 0.0;
+    float xcoord;
+    float ycoord;
 };
 
 struct Edge {
@@ -39,8 +42,15 @@ public:
 
     void createPointsAndRings(int ringCount);
     void createEdges();
+    void makeCartesian();
+    void drawMap();
 
     void polarDistance(struct Point, struct Point);
+
+    void draw(sf::RenderWindow& window);
+   
+
+
 
 
 private:
@@ -49,6 +59,7 @@ private:
     vector<Point> points;
     vector<vector<Point>> rings;
     vector<vector<int>> edges;
+    sf::VertexArray map;
 };
 
 

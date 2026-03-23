@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <SFML/Graphics.hpp>
 #include "GameSpace.h"
 
 
@@ -12,6 +13,11 @@ using namespace std;
 
 int main()
 {
+
+
+
+
+
     string choice;
     int rings;
     bool entryCheck = true;
@@ -53,7 +59,50 @@ int main()
 
     GameSpace g(rings);
 
- 
+
+    sf::RenderWindow window(sf::VideoMode({ 1920, 1080 }), "SFML works!");
+   //sf::CircleShape shape(100.f);
+    //shape.setFillColor(sf::Color::Green);
+    //-------------------------------------------------------------
+    sf::View view(sf::FloatRect({ 0.f, 0.f }, { 1920.f, 1080.f }));
+    view.setCenter({ 0.f, 0.f });   // center your world at (0,0)
+
+    window.setView(view);
+
+    //-------------------------------------------------------------
+
+    while (window.isOpen())
+    {
+        while (const std::optional event = window.pollEvent())
+        {
+
+            //------------------------------------------------------------------------
+
+
+            if (const auto* scroll = event->getIf<sf::Event::MouseWheelScrolled>())
+            {
+                
+
+                if (scroll->delta > 0)
+                    view.zoom(0.9f);
+                else
+                    view.zoom(1.1f);
+
+                window.setView(view);
+            }
+
+            //------------------------------------------------------------------------
+
+
+            if (event->is<sf::Event::Closed>())
+                window.close();
+        }
+
+        window.clear();
+        g.draw(window);
+        //window.draw(shape);
+        window.display();
+    }
 
 
 }
