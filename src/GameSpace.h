@@ -2,6 +2,7 @@
 #define GAMESPACE_H
 #include <string>
 #include <vector>
+#include "StellarBodies.h"
 #include <SFML/Graphics.hpp>
 
 using namespace std;
@@ -16,7 +17,10 @@ struct Point {
 };
 
 struct Edge {
-    int point;
+    Point point1;
+    Point point2;
+
+    int weight = 0;
     //other stuff
 };
 
@@ -42,8 +46,10 @@ public:
 
     void createPointsAndRings(int ringCount);
     void createEdges();
+    
     void makeCartesian();
     void drawMap();
+    void createObstacles();
 
     void polarDistance(struct Point, struct Point);
 
@@ -59,7 +65,12 @@ private:
     vector<Point> points;
     vector<vector<Point>> rings;
     vector<vector<int>> edges;
+    vector<vector<Edge>> otherEdges;
+
     sf::VertexArray map;
+    vector<StellarBody> stellarObjects;
+
+    sf::Font font;
 };
 
 

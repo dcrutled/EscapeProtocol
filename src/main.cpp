@@ -17,7 +17,7 @@ int main()
 
 
 
-
+    srand(time(0));
     string choice;
     int rings;
     bool entryCheck = true;

@@ -1,9 +1,11 @@
 #include <iostream>
 #include "GameSpace.h"
+#include "StellarBodies.h"
 #include <cmath>
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <ctime>
 #include <SFML/Graphics.hpp>
 using namespace std;
 
@@ -64,6 +66,7 @@ GameSpace::GameSpace(int ringCount) {   //gamespace constructor
     int vertices = points.size();
     set_vertices(vertices);
     createEdges();
+    createObstacles();
     drawMap();
    
 
@@ -330,11 +333,19 @@ void GameSpace::createEdges() {
         //----------------------------------------------------------------------------------------------------------------------------------
     }
 
+    otherEdges.resize(edges.size());
+
     for (int i = 0; i < edges.size(); i++) {
 
         cout << "p" << i << ":  ";
 
         for (int k = 0; k < edges[i].size(); k++) {
+
+            Edge temp;
+            temp.point1 = points[i];
+            temp.point2 = points[edges[i][k]];
+
+            otherEdges[i].push_back(temp);
 
             cout << "(" << edges[i][k] << ")  ";
         }
@@ -343,7 +354,7 @@ void GameSpace::createEdges() {
 
     //Temporary addition for professor to check symmetry of graph
     string symChoice;
-    cout << endl << "Would you like to tes the symmetry of your gamespace? Type \"yes\" or \"no\" : ";
+    cout << endl << "Would you like to test the symmetry of your gamespace? Type \"yes\" or \"no\" : ";
     cin >> symChoice;
     if(symChoice == "yes") {
         checkSymmetry();
@@ -386,6 +397,8 @@ void GameSpace::makeCartesian() {
 void GameSpace::drawMap() {
 
     
+
+    
     map = sf::VertexArray(sf::PrimitiveType::Lines);
 
     for (int i = 0; i < edges.size(); i++)
@@ -413,8 +426,92 @@ void GameSpace::drawMap() {
 void GameSpace::draw(sf::RenderWindow& window)
 {
     window.draw(map);
+
+    
+   
+    for (int i = 0; i < points.size(); i++) {
+        sf::Text text(font);
+        text.setCharacterSize(20);
+        text.setFillColor(sf::Color::White);
+
+        float x = points[i].xcoord;
+        float y = points[i].ycoord;
+
+        text.setPosition(sf::Vector2f(x + 5.f, y + 5.f));
+        text.setString(std::to_string(i));
+
+        window.draw(text);
+    }
+    
+    
+
+    for (int i = 0; i < stellarObjects.size(); i++) {
+       
+        window.draw(stellarObjects[i].shape);
+    }
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------------------
+
+
+void GameSpace::createObstacles() {
+    
+    stellarObjects.resize(ringCount);
+    int k;
+
+    
+    if (!font.openFromFile("arial.ttf")) {
+        std::cout << "FAILED\n";
+    }
+
+
+    //srand(time(0));
+
+    for (int i = 1; i <= ringCount; i++) {
+
+        StellarBody tempBody;
+
+        k = rand() % rings[i].size();
+
+    
+
+        tempBody.xcoord = points[rings[i][k].position].xcoord;
+        tempBody.ycoord = points[rings[i][k].position].ycoord;
+
+       
+
+        //cout << k << " (" << points[rings[i][k].position].xcoord << ", " << points[rings[i][k].position].ycoord << ")" << endl;
+
+
+        tempBody.mass = rand() % 10000;
+        tempBody.radius = pow(tempBody.mass, (1.f / 2.75));
+        tempBody.gravity = (.087 * tempBody.mass) / tempBody.radius;
+        
+
+        tempBody.shape.setRadius(tempBody.radius);
+        tempBody.shape.setOrigin(sf::Vector2f(tempBody.radius, tempBody.radius));
+        tempBody.shape.setPosition({ tempBody.xcoord,tempBody.ycoord });
+        tempBody.shape.setFillColor(sf::Color(
+            100 + rand() % 256,
+            100 + rand() % 256,
+            100 + rand() % 256
+        ));
+
+        for (int h = 0; h < edges[rings[i][k].position].size(); h++) {
+
+            otherEdges[rings[i][k].position][h].weight = static_cast<int>(round(tempBody.gravity));
+
+            cout << "Edge" << otherEdges[rings[i][k].position][h].point1.position << " to " << otherEdges[rings[i][k].position][h].point2.position << ": " << otherEdges[rings[i][k].position][h].weight << endl;
+        }
+
+        stellarObjects.push_back(tempBody);
+
+        //cout << tempBody.radius << endl;
+
+
+    }
+
+
+}
