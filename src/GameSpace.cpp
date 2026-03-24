@@ -341,6 +341,8 @@ void GameSpace::createEdges() {
         cout << endl;
     }
 
+    /*
+
     //Temporary addition for professor to check symmetry of graph
     string symChoice;
     cout << endl << "Would you like to tes the symmetry of your gamespace? Type \"yes\" or \"no\" : ";
@@ -348,6 +350,7 @@ void GameSpace::createEdges() {
     if(symChoice == "yes") {
         checkSymmetry();
     }
+    */
 
 }
 
