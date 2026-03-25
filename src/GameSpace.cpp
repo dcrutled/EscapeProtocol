@@ -442,6 +442,23 @@ void GameSpace::draw(sf::RenderWindow& window)
 
         window.draw(text);
     }
+
+    for (int i = 0; i < otherEdges.size(); i++) {
+
+        for (int k = 0; k < otherEdges[i].size(); k++) {
+            sf::Text text(font);
+            text.setCharacterSize(20);
+            text.setFillColor(sf::Color::Green);
+
+            float x = (otherEdges[i][k].point1.xcoord + otherEdges[i][k].point2.xcoord) / 2;
+            float y = (otherEdges[i][k].point1.ycoord + otherEdges[i][k].point2.ycoord) / 2;
+
+            text.setPosition(sf::Vector2f(x-10, y));
+            text.setString(std::to_string(otherEdges[i][k].weight));
+
+            window.draw(text);
+        }
+    }
     
     
 
@@ -502,8 +519,21 @@ void GameSpace::createObstacles() {
         for (int h = 0; h < edges[rings[i][k].position].size(); h++) {
 
             otherEdges[rings[i][k].position][h].weight = static_cast<int>(round(tempBody.gravity));
-
             cout << "Edge" << otherEdges[rings[i][k].position][h].point1.position << " to " << otherEdges[rings[i][k].position][h].point2.position << ": " << otherEdges[rings[i][k].position][h].weight << endl;
+
+            for (int j = 0; j < edges[otherEdges[rings[i][k].position][h].point2.position].size(); j++) {
+                if (otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight == 0) {
+                    otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight = static_cast<int>(round(tempBody.gravity / 2));
+                }
+
+                else {
+                    otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight = otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight
+                        + static_cast<int>(round(tempBody.gravity)) / 2;
+                }
+                cout << "\tEdge" << otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].point1.position << " to " << otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].point2.position << ": " << otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight << endl;
+            }
+
+            
         }
 
         stellarObjects.push_back(tempBody);
