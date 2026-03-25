@@ -50,6 +50,7 @@ public:
     void makeCartesian();
     void drawMap();
     void createObstacles();
+    void setEdgeWeight(int i, int k, StellarBody tempBody);
 
     void polarDistance(struct Point, struct Point);
 
