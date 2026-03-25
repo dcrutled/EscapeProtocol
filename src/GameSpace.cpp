@@ -465,7 +465,7 @@ void GameSpace::createObstacles() {
     int k;
 
     
-    if (!font.openFromFile("arial.ttf")) {
+    if (!font.openFromFile("assets/fonts/Megrim-Regular.ttf")) {
         std::cout << "FAILED\n";
     }
 
@@ -514,6 +514,21 @@ void GameSpace::createObstacles() {
         //cout << tempBody.radius << endl;
 
 
+    }
+
+
+}
+
+
+
+
+void GameSpace::setEdgeWeight(int i, int k, StellarBody tempBody) {
+
+    for (int h = 0; h < edges[rings[i][k].position].size(); h++) {
+
+        otherEdges[rings[i][k].position][h].weight = static_cast<int>(round(tempBody.gravity));
+
+        cout << "Edge" << otherEdges[rings[i][k].position][h].point1.position << " to " << otherEdges[rings[i][k].position][h].point2.position << ": " << otherEdges[rings[i][k].position][h].weight << endl;
     }
 
 
