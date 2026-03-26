@@ -10,6 +10,7 @@ using namespace std;
 struct Point {
     string name;
     int position;
+    int ring;
     int radius = 0;
     float theta = 0.0;
     float xcoord;
@@ -19,6 +20,7 @@ struct Point {
 struct Edge {
     Point point1;
     Point point2;
+    int endRing;
 
     int weight = 0;
     //other stuff
@@ -51,10 +53,14 @@ public:
     void drawMap();
     void createObstacles();
     void setEdgeWeight(int i, int k, StellarBody tempBody);
+    int calculateGravity(Edge);
 
     void polarDistance(struct Point, struct Point);
 
     void draw(sf::RenderWindow& window);
+
+
+    void testShowStuff();
    
 
 

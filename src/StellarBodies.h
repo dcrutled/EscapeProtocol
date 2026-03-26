@@ -12,6 +12,7 @@ using namespace std;
 struct StellarBody {
 	
 	string type;
+	//Point point;
 
 	float xcoord;
 	float ycoord;

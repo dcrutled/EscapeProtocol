@@ -67,6 +67,7 @@ GameSpace::GameSpace(int ringCount) {   //gamespace constructor
     set_vertices(vertices);
     createEdges();
     createObstacles();
+    testShowStuff();
     drawMap();
    
 
@@ -105,6 +106,7 @@ void GameSpace::createPointsAndRings(int ringCount) {
             Point point;
             point.name = "p0";
             point.position = 0;
+            point.ring = 0;
             point.radius = 0;
             point.theta = 0;
             //points.push_back(vector<Point>());
@@ -161,7 +163,7 @@ void GameSpace::createPointsAndRings(int ringCount) {
                 point.theta = points[points.size() - 1].theta + (pi) / (pow(2, (k - 1)));
             }
 
-
+            point.ring = h;
             points.push_back(point);
             rings[h].push_back(point);
 
@@ -499,6 +501,7 @@ void GameSpace::createObstacles() {
 
         tempBody.xcoord = points[rings[i][k].position].xcoord;
         tempBody.ycoord = points[rings[i][k].position].ycoord;
+        //tempBody.point = points[rings[i][k].position];
 
        
 
@@ -522,7 +525,7 @@ void GameSpace::createObstacles() {
         for (int h = 0; h < edges[rings[i][k].position].size(); h++) {
 
             otherEdges[rings[i][k].position][h].weight = static_cast<int>(round(tempBody.gravity));
-            cout << "Edge" << otherEdges[rings[i][k].position][h].point1.position << " to " << otherEdges[rings[i][k].position][h].point2.position << ": " << otherEdges[rings[i][k].position][h].weight << endl;
+            //cout << "Edge" << otherEdges[rings[i][k].position][h].point1.position << " to " << otherEdges[rings[i][k].position][h].point2.position << ": " << otherEdges[rings[i][k].position][h].weight << endl;
 
             for (int j = 0; j < edges[otherEdges[rings[i][k].position][h].point2.position].size(); j++) {
                 if (otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight == 0) {
@@ -533,7 +536,7 @@ void GameSpace::createObstacles() {
                     otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight = otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight
                         + static_cast<int>(round(tempBody.gravity)) / 2;
                 }
-                cout << "\tEdge" << otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].point1.position << " to " << otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].point2.position << ": " << otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight << endl;
+                //cout << "\tEdge" << otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].point1.position << " to " << otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].point2.position << ": " << otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight << endl;
             }
 
             
@@ -554,12 +557,65 @@ void GameSpace::createObstacles() {
 
 void GameSpace::setEdgeWeight(int i, int k, StellarBody tempBody) {
 
-    for (int h = 0; h < edges[rings[i][k].position].size(); h++) {
+    for (int i = 0; i < otherEdges.size(); i++) {
 
-        otherEdges[rings[i][k].position][h].weight = static_cast<int>(round(tempBody.gravity));
+        for (int k = 0; k < otherEdges[i].size(); k++) {
+            otherEdges[i][k].weight = calculateGravity(otherEdges[i][k]);
 
-        cout << "Edge" << otherEdges[rings[i][k].position][h].point1.position << " to " << otherEdges[rings[i][k].position][h].point2.position << ": " << otherEdges[rings[i][k].position][h].weight << endl;
+           // if(otherEdges[otherEdges[i][k].point2.position][])
+        }
+  }
+
+
+}
+
+
+void GameSpace::testShowStuff() {
+
+    for (int i = 0; i < otherEdges.size(); i++) {
+        cout << "Point (" << otherEdges[i][0].point1.position << ") " << endl;
+
+        for (int k = 0; k < otherEdges[i].size(); k++) {
+
+            
+                cout << "\tP(" << otherEdges[i][k].point1.position << ") to P(" << otherEdges[i][k].point2.position << ")  Weight: " << otherEdges[i][k].weight << endl;
+
+
+
+        }
+
     }
 
+
+}
+
+
+
+int GameSpace::calculateGravity(Edge temp) {
+
+    float totalGrav = 0;
+
+    for (int i = 0; i < stellarObjects.size(); i++) {
+        float grav;
+
+        float d1 = sqrt((pow((stellarObjects[i].xcoord - temp.point1.xcoord), 2)) + (pow((stellarObjects[i].ycoord - temp.point1.ycoord), 2)));
+        float d2 = sqrt((pow((stellarObjects[i].xcoord - temp.point2.xcoord), 2)) + (pow((stellarObjects[i].ycoord - temp.point2.ycoord), 2)));
+
+        
+        if (d2 > d1) {
+            grav = (.087 * 10 * stellarObjects[i].mass * -1) / d2;
+        }
+
+        else {
+            grav = (.087 * 10 * stellarObjects[i].mass) / d2;
+        }
+
+        totalGrav = totalGrav + grav;
+
+    }
+
+    int weight = (int)totalGrav;
+
+    return weight;
 
 }
