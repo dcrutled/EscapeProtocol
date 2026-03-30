@@ -424,6 +424,9 @@ void GameSpace::drawMap() {
             v1.position = sf::Vector2f(points[i].xcoord, points[i].ycoord);
             v2.position = sf::Vector2f(points[edges[i][k]].xcoord, points[edges[i][k]].ycoord);
 
+            v1.color = sf::Color(255, 255, 255, 100);
+            v2.color = sf::Color(255, 255, 255, 100);
+
 
             map.append(v1);
             map.append(v2);
@@ -440,19 +443,45 @@ void GameSpace::draw(sf::RenderWindow& window)
 {
     window.draw(map);
 
+    for (int i = 0; i < stellarObjects.size(); i++) {
+
+        window.draw(stellarObjects[i].shape);
+    }
+
+
     
    
     for (int i = 0; i < points.size(); i++) {
+      
+
+
+
         sf::Text text(font);
-        text.setCharacterSize(20);
+        text.setCharacterSize(15);
         text.setFillColor(sf::Color::White);
+
+        text.setOutlineColor(sf::Color::Black);
+        text.setOutlineThickness(1.f);
 
         float x = points[i].xcoord;
         float y = points[i].ycoord;
 
-        text.setPosition(sf::Vector2f(x + 5.f, y + 5.f));
+    
+
+
+        text.setPosition(sf::Vector2f(x, y));
         text.setString(std::to_string(i));
 
+        sf::FloatRect bounds = text.getGlobalBounds();
+
+        text.setPosition({
+            points[i].xcoord - bounds.size.x / 2.f,
+            points[i].ycoord - bounds.size.y / 2.f - 2.f
+            });
+
+        text.setStyle(sf::Text::Bold);
+
+        window.draw(text);
         window.draw(text);
     }
 
@@ -469,7 +498,8 @@ void GameSpace::draw(sf::RenderWindow& window)
 
                 sf::Text text(font);
                 text.setCharacterSize(20);
-                text.setFillColor(sf::Color::Green);
+                text.setFillColor(sf::Color(255, 215, 0));
+                if(otherEdges[i][k].point2.ring == otherEdges[i][k].point1.ring){ text.setFillColor(sf::Color(0,255,255,50)); }
 
                 float x = (otherEdges[i][k].point1.xcoord + otherEdges[i][k].point2.xcoord) / 2;
                 float y = (otherEdges[i][k].point1.ycoord + otherEdges[i][k].point2.ycoord) / 2;
@@ -478,16 +508,14 @@ void GameSpace::draw(sf::RenderWindow& window)
                 text.setString(std::to_string(otherEdges[i][k].weight));
 
                 window.draw(text);
+                window.draw(text);
             }
         }
     }
     
     
 
-    for (int i = 0; i < stellarObjects.size(); i++) {
-       
-        window.draw(stellarObjects[i].shape);
-    }
+   
 }
 
 
@@ -501,7 +529,7 @@ void GameSpace::createObstacles() {
     int k;
 
 
-    if (!font.openFromFile("assets/fonts/Megrim-Regular.ttf")) {
+    if (!font.openFromFile("assets/fonts/JLSDataGothicC_NC.otf")) {
         std::cout << "FAILED\n";
     }
 
