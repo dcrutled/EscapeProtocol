@@ -45,6 +45,7 @@ public:
     int get_Degree(int v) const;
 
     bool checkSymmetry() const;
+    //bool checkOtherSymmetry() const;
 
     void createPointsAndRings(int ringCount);
     void createEdges();

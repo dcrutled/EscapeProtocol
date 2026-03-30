@@ -129,6 +129,7 @@ void GameSpace::createPointsAndRings(int ringCount) {
         for (int i = 1; i <= pow(2, k); i++) {
 
             Point point;
+            point.ring = h;
             //points.push_back(vector<Point>());
 
             int holding = points.size();
@@ -142,6 +143,7 @@ void GameSpace::createPointsAndRings(int ringCount) {
             if (h % 2 == 0) {                        //even rings are offset
                 if (i == 1) {
                     point.theta = (i * pi) / (pow(2, (k)));
+                    //point.ring = h + 1;
                     points.push_back(point);
                     rings[h].push_back(point);
                     continue;
@@ -157,18 +159,23 @@ void GameSpace::createPointsAndRings(int ringCount) {
                 if (i == 1) {
                     point.theta = 0;
                     points.push_back(point);
+                    //point.ring = h + 1;
                     rings[h].push_back(point);
                     continue;
                 }
                 point.theta = points[points.size() - 1].theta + (pi) / (pow(2, (k - 1)));
             }
 
-            point.ring = h;
+            //point.ring = h;
             points.push_back(point);
             rings[h].push_back(point);
 
         }
-
+        //points[1].ring = 1;
+        //if (points.size() > 25) points[25].ring = 5;
+        for (int i = 0; i < points.size(); i++) {
+            std::cout << "Point " << i << " -> ring " << points[i].ring << std::endl;
+        }
 
     }
     
@@ -346,6 +353,7 @@ void GameSpace::createEdges() {
             Edge temp;
             temp.point1 = points[i];
             temp.point2 = points[edges[i][k]];
+            temp.endRing = points[edges[i][k]].ring;
 
             otherEdges[i].push_back(temp);
 
@@ -451,17 +459,26 @@ void GameSpace::draw(sf::RenderWindow& window)
     for (int i = 0; i < otherEdges.size(); i++) {
 
         for (int k = 0; k < otherEdges[i].size(); k++) {
-            sf::Text text(font);
-            text.setCharacterSize(20);
-            text.setFillColor(sf::Color::Green);
 
-            float x = (otherEdges[i][k].point1.xcoord + otherEdges[i][k].point2.xcoord) / 2;
-            float y = (otherEdges[i][k].point1.ycoord + otherEdges[i][k].point2.ycoord) / 2;
+            if (otherEdges[i][k].point2.ring < otherEdges[i][k].point1.ring || otherEdges[i][k].weight == 0) {
+                continue;
+            }
 
-            text.setPosition(sf::Vector2f(x-10, y));
-            text.setString(std::to_string(otherEdges[i][k].weight));
+            else {
 
-            window.draw(text);
+
+                sf::Text text(font);
+                text.setCharacterSize(20);
+                text.setFillColor(sf::Color::Green);
+
+                float x = (otherEdges[i][k].point1.xcoord + otherEdges[i][k].point2.xcoord) / 2;
+                float y = (otherEdges[i][k].point1.ycoord + otherEdges[i][k].point2.ycoord) / 2;
+
+                text.setPosition(sf::Vector2f(x - 10, y));
+                text.setString(std::to_string(otherEdges[i][k].weight));
+
+                window.draw(text);
+            }
         }
     }
     
@@ -479,11 +496,11 @@ void GameSpace::draw(sf::RenderWindow& window)
 
 
 void GameSpace::createObstacles() {
-    
+
     stellarObjects.resize(ringCount);
     int k;
 
-    
+
     if (!font.openFromFile("assets/fonts/Megrim-Regular.ttf")) {
         std::cout << "FAILED\n";
     }
@@ -497,13 +514,13 @@ void GameSpace::createObstacles() {
 
         k = rand() % rings[i].size();
 
-    
+
 
         tempBody.xcoord = points[rings[i][k].position].xcoord;
         tempBody.ycoord = points[rings[i][k].position].ycoord;
         //tempBody.point = points[rings[i][k].position];
 
-       
+
 
         //cout << k << " (" << points[rings[i][k].position].xcoord << ", " << points[rings[i][k].position].ycoord << ")" << endl;
 
@@ -511,7 +528,7 @@ void GameSpace::createObstacles() {
         tempBody.mass = rand() % 10000;
         tempBody.radius = pow(tempBody.mass, (1.f / 2.75));
         tempBody.gravity = (.087 * tempBody.mass) / tempBody.radius;
-        
+
 
         tempBody.shape.setRadius(tempBody.radius);
         tempBody.shape.setOrigin(sf::Vector2f(tempBody.radius, tempBody.radius));
@@ -521,6 +538,8 @@ void GameSpace::createObstacles() {
             100 + rand() % 256,
             100 + rand() % 256
         ));
+
+        /*
 
         for (int h = 0; h < edges[rings[i][k].position].size(); h++) {
 
@@ -539,8 +558,8 @@ void GameSpace::createObstacles() {
                 //cout << "\tEdge" << otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].point1.position << " to " << otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].point2.position << ": " << otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight << endl;
             }
 
-            
-        }
+
+        }*/
 
         stellarObjects.push_back(tempBody);
 
@@ -549,6 +568,49 @@ void GameSpace::createObstacles() {
 
     }
 
+    for (int i = 0; i < otherEdges.size(); i++) {
+
+
+        for (int k = 0; k < otherEdges[i].size(); k++) {
+
+            if (otherEdges[i][k].point2.ring < otherEdges[i][k].point1.ring) {
+                continue;
+            }
+
+            else if (otherEdges[i][k].point2.ring == otherEdges[i][k].point1.ring) {
+                int u = otherEdges[i][k].point1.position;
+                int v = otherEdges[i][k].point2.position;
+
+                if (u < v) {
+                    int w = calculateGravity(otherEdges[i][k]);
+
+                    // assign to both directions
+                    otherEdges[i][k].weight = w;
+
+                    // find reverse edge and assign same weight
+                    for (auto& e : otherEdges[v]) {
+                        if (e.point2.position == u) {
+                            e.weight = w;
+                            break;
+                        }
+                    }
+                }
+
+
+                else {
+                    continue;
+                }
+            }
+
+            else {
+                otherEdges[i][k].weight = calculateGravity(otherEdges[i][k]);
+            }
+
+
+        }
+
+
+    }
 
 }
 
@@ -586,6 +648,20 @@ void GameSpace::testShowStuff() {
 
     }
 
+    for (int i = 0; i < otherEdges.size(); i++) {
+        cout << "Point (" << otherEdges[i][0].point1.position << ") " << endl;
+
+        for (int k = 0; k < otherEdges[i].size(); k++) {
+
+
+            cout << "\tP(" << otherEdges[i][k].point1.position << ") to P(" << otherEdges[i][k].point2.position << ")  Ring: " << otherEdges[i][k].endRing << endl;
+
+
+
+        }
+
+    }
+
 
 }
 
@@ -598,24 +674,83 @@ int GameSpace::calculateGravity(Edge temp) {
     for (int i = 0; i < stellarObjects.size(); i++) {
         float grav;
 
+
         float d1 = sqrt((pow((stellarObjects[i].xcoord - temp.point1.xcoord), 2)) + (pow((stellarObjects[i].ycoord - temp.point1.ycoord), 2)));
         float d2 = sqrt((pow((stellarObjects[i].xcoord - temp.point2.xcoord), 2)) + (pow((stellarObjects[i].ycoord - temp.point2.ycoord), 2)));
 
+        if (temp.point2.ring == temp.point1.ring) {
+            int ave = (d1 + d2) / 2;
+            grav = (.087 * 10 * stellarObjects[i].mass) / (ave);
+            totalGrav = totalGrav + grav;
+            continue;
+        }
+
+        //if (d2 < 50) { d2 = 50; };
+
         
-        if (d2 > d1) {
-            grav = (.087 * 10 * stellarObjects[i].mass * -1) / d2;
+        else if (d2 > d1) {
+            grav = (.087 * 10 * stellarObjects[i].mass) / (d2 + 50);
         }
 
         else {
-            grav = (.087 * 10 * stellarObjects[i].mass) / d2;
+            grav = (.087 * 10 * stellarObjects[i].mass*-1) / (d2 + 50);
         }
 
         totalGrav = totalGrav + grav;
 
     }
+    /*
+    if (!std::isfinite(totalGrav)) {
+        std::cout << "BAD GRAVITY: "
+            << temp.point1.position << " -> "
+            << temp.point2.position << std::endl;
+        return 0;  // safe fallback
+    }*/
 
     int weight = (int)totalGrav;
 
     return weight;
 
 }
+
+
+//--------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------
+
+/*
+
+bool GameSpace::checkOtherSymmetry() const {    //checks each edge vector for each vertex. if match is found, it makes a direct reverse check to confirm symmetry.
+    bool symmetry = true;
+
+    for (int h = 0; h < otherEdges.size(); h++) {
+
+
+        for (int i = 0; i < otherEdges.size(); i++) {
+
+            int cnt = count(otherEdges[i].begin(), otherEdges[i].end(), h); //initial value check
+
+            if (cnt > 0) {
+                int cnt2 = count(otherEdges[h].begin(), otherEdges[h].end(), i); //reverse check to confirm symmetry
+
+                if (cnt2 == cnt) {
+                    continue;
+                }
+
+                else if (cnt2 != cnt) {
+                    cout << "Symmetry Error Found! " << h << " and " << i << " are not symmetric." << endl;
+                    symmetry = false;
+                }
+            }
+            else {
+                continue;
+            }
+
+        }
+        cout << "Symmetry Confirmed" << endl;
+    }
+
+    return symmetry;
+
+}
+
+*/
