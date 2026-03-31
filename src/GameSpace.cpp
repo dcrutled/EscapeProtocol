@@ -536,7 +536,7 @@ void GameSpace::createObstacles() {
 
     //srand(time(0));
 
-    for (int i = 1; i <= ringCount; i++) {
+    for (int i = 1; i < ringCount; i++) {
 
         StellarBody tempBody;
 
@@ -691,6 +691,16 @@ void GameSpace::testShowStuff() {
     }
 
 
+    bellmanFord();
+
+    for (int i = 0; i < paths.size(); i++) {
+        cout << "Distance to: " << i << " = " << paths[i].distance << endl;
+        //cout << "Parent of: " << i << " is " << paths[i].parent << endl;
+    }
+
+    
+
+
 }
 
 
@@ -782,3 +792,41 @@ bool GameSpace::checkOtherSymmetry() const {    //checks each edge vector for ea
 }
 
 */
+
+
+
+void GameSpace::bellmanFord() {
+    //ShortestPath initial;
+    paths.resize(points.size());
+    //paths.push_back(initial);
+    paths[0].distance = 0;
+
+
+
+
+    for (int i = 0; i < points.size(); i++) {
+
+        for (int k = 0; k < otherEdges.size(); k++) {
+
+            for (auto& e : otherEdges[k]) {
+                if (e.point2.ring >= e.point1.ring) {
+                    cout << "Good" << endl;
+
+                    if (paths[e.point1.position].distance + e.weight < paths[e.point2.position].distance) {
+                        paths[e.point2.position].distance = paths[e.point1.position].distance + e.weight;
+                        paths[e.point2.position].parent = e.point1.position;
+                    }
+
+                    else { continue; }
+                }
+
+                else {
+                    continue;
+                }
+            }
+        }
+    }
+
+
+
+}

@@ -2,6 +2,7 @@
 #define GAMESPACE_H
 #include <string>
 #include <vector>
+#include <limits>
 #include "StellarBodies.h"
 #include <SFML/Graphics.hpp>
 
@@ -24,6 +25,12 @@ struct Edge {
 
     int weight = 0;
     //other stuff
+};
+
+
+struct ShortestPath {
+    double distance = numeric_limits<double>::infinity();
+    int parent = -1;
 };
 
 
@@ -60,6 +67,8 @@ public:
 
     void draw(sf::RenderWindow& window);
 
+    void bellmanFord();
+
 
     void testShowStuff();
    
@@ -77,6 +86,8 @@ private:
 
     sf::VertexArray map;
     vector<StellarBody> stellarObjects;
+
+    vector<ShortestPath> paths;
 
     sf::Font font;
 };
