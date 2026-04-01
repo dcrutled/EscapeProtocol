@@ -59,8 +59,9 @@ public:
     
     void makeCartesian();
     void drawMap();
+    void makeBackground();
     void createObstacles();
-    void setEdgeWeight(int i, int k, StellarBody tempBody);
+   
     int calculateGravity(Edge);
 
     void polarDistance(struct Point, struct Point);
@@ -85,6 +86,8 @@ private:
     vector<vector<Edge>> otherEdges;
 
     sf::VertexArray map;
+    //sf::Sprite background;
+    //sf::Texture texture;
     vector<StellarBody> stellarObjects;
 
     vector<ShortestPath> paths;

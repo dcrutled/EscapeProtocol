@@ -67,8 +67,11 @@ GameSpace::GameSpace(int ringCount) {   //gamespace constructor
     set_vertices(vertices);
     createEdges();
     createObstacles();
+    bellmanFord();
     testShowStuff();
+    
     drawMap();
+    makeBackground();
    
 
 }
@@ -173,19 +176,23 @@ void GameSpace::createPointsAndRings(int ringCount) {
         }
         //points[1].ring = 1;
         //if (points.size() > 25) points[25].ring = 5;
+
+        /*
         for (int i = 0; i < points.size(); i++) {
             std::cout << "Point " << i << " -> ring " << points[i].ring << std::endl;
-        }
+        }*/
 
     }
     
     makeCartesian();
     
     //END OF FOR LOOP FOR POINT CREATION ----------------- UNCOMMENT BLOCK BELOW IF YOU WANT TO CHECK INDIVIDUAL POINT COORDINATES
-
+    /*
     for (int i = 0; i < size(points); i++) {
         cout << points[i].name << "   (" << points[i].xcoord << ", " << points[i].ycoord << ")" << endl;
-    }
+    }*/
+
+    cout << points[size(points) - 1].name << "   (" << points[size(points) - 1].xcoord << ", " << points[size(points) - 1].ycoord << ")" << endl;
 
 
 }
@@ -344,6 +351,8 @@ void GameSpace::createEdges() {
 
     otherEdges.resize(edges.size());
 
+    
+
     for (int i = 0; i < edges.size(); i++) {
 
         cout << "p" << i << ":  ";
@@ -441,7 +450,11 @@ void GameSpace::drawMap() {
 
 void GameSpace::draw(sf::RenderWindow& window)
 {
+
+
     window.draw(map);
+
+
 
     for (int i = 0; i < stellarObjects.size(); i++) {
 
@@ -645,20 +658,6 @@ void GameSpace::createObstacles() {
 
 
 
-void GameSpace::setEdgeWeight(int i, int k, StellarBody tempBody) {
-
-    for (int i = 0; i < otherEdges.size(); i++) {
-
-        for (int k = 0; k < otherEdges[i].size(); k++) {
-            otherEdges[i][k].weight = calculateGravity(otherEdges[i][k]);
-
-           // if(otherEdges[otherEdges[i][k].point2.position][])
-        }
-  }
-
-
-}
-
 
 void GameSpace::testShowStuff() {
 
@@ -731,7 +730,7 @@ int GameSpace::calculateGravity(Edge temp) {
         }
 
         else {
-            grav = (.087 * 10 * stellarObjects[i].mass*-1) / (d2 + 50);
+            grav = (.037 * 10 * stellarObjects[i].mass*-1) / (d2 + 50);
         }
 
         totalGrav = totalGrav + grav;
@@ -755,43 +754,6 @@ int GameSpace::calculateGravity(Edge temp) {
 //--------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------
 
-/*
-
-bool GameSpace::checkOtherSymmetry() const {    //checks each edge vector for each vertex. if match is found, it makes a direct reverse check to confirm symmetry.
-    bool symmetry = true;
-
-    for (int h = 0; h < otherEdges.size(); h++) {
-
-
-        for (int i = 0; i < otherEdges.size(); i++) {
-
-            int cnt = count(otherEdges[i].begin(), otherEdges[i].end(), h); //initial value check
-
-            if (cnt > 0) {
-                int cnt2 = count(otherEdges[h].begin(), otherEdges[h].end(), i); //reverse check to confirm symmetry
-
-                if (cnt2 == cnt) {
-                    continue;
-                }
-
-                else if (cnt2 != cnt) {
-                    cout << "Symmetry Error Found! " << h << " and " << i << " are not symmetric." << endl;
-                    symmetry = false;
-                }
-            }
-            else {
-                continue;
-            }
-
-        }
-        cout << "Symmetry Confirmed" << endl;
-    }
-
-    return symmetry;
-
-}
-
-*/
 
 
 
@@ -810,7 +772,7 @@ void GameSpace::bellmanFord() {
 
             for (auto& e : otherEdges[k]) {
                 if (e.point2.ring >= e.point1.ring) {
-                    cout << "Good" << endl;
+                    //cout << "Good" << endl;
 
                     if (paths[e.point1.position].distance + e.weight < paths[e.point2.position].distance) {
                         paths[e.point2.position].distance = paths[e.point1.position].distance + e.weight;
@@ -828,5 +790,19 @@ void GameSpace::bellmanFord() {
     }
 
 
+
+}
+
+
+
+
+void GameSpace::makeBackground() {
+
+    //sf::Texture texture;
+    //if (!texture.loadFromFile("assets/background/background_1.png")) {
+        // handle error
+    //}
+
+    //background.setTexture(texture);
 
 }
