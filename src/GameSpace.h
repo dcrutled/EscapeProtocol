@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <limits>
-#include "StellarBodies.h"
+#include "CelestialObject.h"
 #include <SFML/Graphics.hpp>
 
 using namespace std;
@@ -89,6 +89,7 @@ private:
     //sf::Sprite background;
     //sf::Texture texture;
     vector<StellarBody> stellarObjects;
+    vector<CelestialObject> celestialObjects;
 
     vector<ShortestPath> paths;
 

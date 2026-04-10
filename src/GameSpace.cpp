@@ -1,6 +1,6 @@
 #include <iostream>
 #include "GameSpace.h"
-#include "StellarBodies.h"
+#include "CelestialObject.h"
 #include <cmath>
 #include <vector>
 #include <string>
@@ -560,13 +560,19 @@ void GameSpace::createObstacles() {
         tempBody.xcoord = points[rings[i][k].position].xcoord;
         tempBody.ycoord = points[rings[i][k].position].ycoord;
         //tempBody.point = points[rings[i][k].position];
-
+        float xcoord = points[rings[i][k].position].xcoord;
+        float ycoord = points[rings[i][k].position].ycoord;
 
 
         //cout << k << " (" << points[rings[i][k].position].xcoord << ", " << points[rings[i][k].position].ycoord << ")" << endl;
 
 
         tempBody.mass = rand() % 10000;
+        float mass = rand() % 10000;
+
+        CelestialObject body(xcoord, ycoord, mass);
+        celestialObjects.push_back(body);
+
         tempBody.radius = pow(tempBody.mass, (1.f / 2.75));
         tempBody.gravity = (.087 * tempBody.mass) / tempBody.radius;
 

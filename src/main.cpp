@@ -34,7 +34,7 @@ int main()
     */
 
 
-    sf::Sprite planet(planets[15]);
+    sf::Sprite planet(planets[3]);
 
     planet.setPosition({ 100.0f, 100.0f });
 
