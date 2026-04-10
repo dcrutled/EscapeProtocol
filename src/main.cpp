@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cmath>
 #include <SFML/Graphics.hpp>
+#include <filesystem>
 #include "GameSpace.h"
 
 
@@ -13,6 +14,34 @@ using namespace std;
 
 int main()
 {
+
+    vector<sf::Texture> planets;
+
+    for (auto& entry : filesystem::directory_iterator("assets/Planets/")) {
+
+        sf::Texture planet_sheet;
+        planet_sheet.loadFromFile(entry);
+        planets.push_back(planet_sheet);
+    }
+
+
+    /*sf::Texture planet_sheet;
+
+
+    if (!planet_sheet.loadFromFile("assets/Planets/blue_cloudy_water_planet.png")) {
+        cout << "ERROR" << endl;
+    }
+    */
+
+
+    sf::Sprite planet(planets[15]);
+
+    planet.setPosition({ 100.0f, 100.0f });
+
+    
+    //planet.setTextureRect(sf::IntRect({0,0},{100,100}));
+
+
 
 
 
@@ -71,8 +100,19 @@ int main()
 
     //-------------------------------------------------------------
 
+    sf::Clock clock;
+
+    int idx = 0;
+    float anim_timer = 0;
+    float anim_speed = 0.23;
+
     while (window.isOpen())
     {
+
+        float delta_time = clock.restart().asSeconds();
+
+       
+
         while (const std::optional event = window.pollEvent())
         {
 
@@ -98,8 +138,21 @@ int main()
                 window.close();
         }
 
+
+        anim_timer += delta_time;
+
+        if (anim_timer >= anim_speed) {
+            anim_timer = 0;
+            idx = (idx + 1) % 50;
+        }
+
+        
+
+        planet.setTextureRect(sf::IntRect({ idx * 100,0 }, { 100,100 }));
+
         window.clear();
         g.draw(window);
+        window.draw(planet);
         //window.draw(shape);
         window.display();
     }

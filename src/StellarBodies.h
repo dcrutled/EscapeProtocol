@@ -25,7 +25,18 @@ struct StellarBody {
 };
 
 
+class CelestialObject {
 
+public:
+
+
+
+
+private:
+
+
+
+};
 
 
 
