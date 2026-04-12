@@ -151,8 +151,9 @@ int main()
         planet.setTextureRect(sf::IntRect({ idx * 100,0 }, { 100,100 }));
 
         window.clear();
+        g.update(delta_time);
         g.draw(window);
-        window.draw(planet);
+        //window.draw(planet);
         //window.draw(shape);
         window.display();
     }

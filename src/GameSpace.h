@@ -68,10 +68,14 @@ public:
 
     void draw(sf::RenderWindow& window);
 
+    void update(float dt);
+
     void bellmanFord();
 
 
     void testShowStuff();
+
+    void loadAssets();
    
 
 
@@ -88,8 +92,13 @@ private:
     sf::VertexArray map;
     //sf::Sprite background;
     //sf::Texture texture;
-    vector<StellarBody> stellarObjects;
+    //vector<StellarBody> stellarObjects;
+
+
     vector<CelestialObject> celestialObjects;
+
+    //vector<sf::Texture> planets;
+    vector<unique_ptr<sf::Texture>> planets;
 
     vector<ShortestPath> paths;
 

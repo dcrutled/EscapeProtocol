@@ -60,7 +60,29 @@ bool GameSpace::checkSymmetry() const {    //checks each edge vector for each ve
 
 }
 
-GameSpace::GameSpace(int ringCount) {   //gamespace constructor
+
+void GameSpace::loadAssets() {
+
+    for (auto& entry : filesystem::directory_iterator("assets/Planets/")) {
+
+       // auto planet_sheet = make_unique<sf::Texture>();;
+        auto texture = std::make_unique<sf::Texture>();
+        if (texture->loadFromFile(entry.path().string())) {
+            planets.push_back(std::move(texture));
+        }
+        //auto texture = std::make_unique<sf::Texture>();
+        //planet_sheet.loadFromFile(entry.path().string());
+       // planets.push_back(move(planet_sheet));
+    }
+
+
+}
+
+
+
+
+GameSpace::GameSpace(int ringCount) {
+    loadAssets();//gamespace constructor
     this -> ringCount = ringCount;
     createPointsAndRings(ringCount);
     int vertices = points.size();
@@ -446,7 +468,13 @@ void GameSpace::drawMap() {
 }
 
 
+void GameSpace::update(float dt) {
 
+    for (auto& obj : celestialObjects) {
+        obj.update(dt);
+    }
+
+}
 
 void GameSpace::draw(sf::RenderWindow& window)
 {
@@ -454,14 +482,23 @@ void GameSpace::draw(sf::RenderWindow& window)
 
     window.draw(map);
 
+   
 
-
-    for (int i = 0; i < stellarObjects.size(); i++) {
-
-        window.draw(stellarObjects[i].shape);
+    for (auto& obj : celestialObjects) {
+        obj.draw(window);
+        //sf::CircleShape debugDot(10.f);
+        //debugDot.setFillColor(sf::Color::Red);
+        //debugDot.setOrigin(sf::Vector2f(9.5f, 9.f));
+        //debugDot.setPosition(sf::Vector2f(obj.getX(), obj.getY()));
+        //window.draw(debugDot);
     }
 
-
+    sf::CircleShape debugDot(10.f);
+    debugDot.setFillColor(sf::Color::Red);
+    debugDot.setRadius(10);
+    debugDot.setOrigin(sf::Vector2f(10, 10));
+    debugDot.setPosition(sf::Vector2f(0, 0));
+    window.draw(debugDot);
     
    
     for (int i = 0; i < points.size(); i++) {
@@ -538,7 +575,7 @@ void GameSpace::draw(sf::RenderWindow& window)
 
 void GameSpace::createObstacles() {
 
-    stellarObjects.resize(ringCount);
+    
     int k;
 
 
@@ -551,15 +588,13 @@ void GameSpace::createObstacles() {
 
     for (int i = 1; i < ringCount; i++) {
 
-        StellarBody tempBody;
+        
 
         k = rand() % rings[i].size();
 
 
 
-        tempBody.xcoord = points[rings[i][k].position].xcoord;
-        tempBody.ycoord = points[rings[i][k].position].ycoord;
-        //tempBody.point = points[rings[i][k].position];
+        
         float xcoord = points[rings[i][k].position].xcoord;
         float ycoord = points[rings[i][k].position].ycoord;
 
@@ -567,50 +602,16 @@ void GameSpace::createObstacles() {
         //cout << k << " (" << points[rings[i][k].position].xcoord << ", " << points[rings[i][k].position].ycoord << ")" << endl;
 
 
-        tempBody.mass = rand() % 10000;
+        
         float mass = rand() % 10000;
 
-        CelestialObject body(xcoord, ycoord, mass);
+        //sf::Texture tex = planets[rand() % planets.size() + 1];
+        const sf::Texture& tex = *planets[rand() % planets.size()];
+
+        CelestialObject body(xcoord, ycoord, mass, tex);
         celestialObjects.push_back(body);
 
-        tempBody.radius = pow(tempBody.mass, (1.f / 2.75));
-        tempBody.gravity = (.087 * tempBody.mass) / tempBody.radius;
 
-
-        tempBody.shape.setRadius(tempBody.radius);
-        tempBody.shape.setOrigin(sf::Vector2f(tempBody.radius, tempBody.radius));
-        tempBody.shape.setPosition({ tempBody.xcoord,tempBody.ycoord });
-        tempBody.shape.setFillColor(sf::Color(
-            100 + rand() % 256,
-            100 + rand() % 256,
-            100 + rand() % 256
-        ));
-
-        /*
-
-        for (int h = 0; h < edges[rings[i][k].position].size(); h++) {
-
-            otherEdges[rings[i][k].position][h].weight = static_cast<int>(round(tempBody.gravity));
-            //cout << "Edge" << otherEdges[rings[i][k].position][h].point1.position << " to " << otherEdges[rings[i][k].position][h].point2.position << ": " << otherEdges[rings[i][k].position][h].weight << endl;
-
-            for (int j = 0; j < edges[otherEdges[rings[i][k].position][h].point2.position].size(); j++) {
-                if (otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight == 0) {
-                    otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight = static_cast<int>(round(tempBody.gravity / 2));
-                }
-
-                else {
-                    otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight = otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight
-                        + static_cast<int>(round(tempBody.gravity)) / 2;
-                }
-                //cout << "\tEdge" << otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].point1.position << " to " << otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].point2.position << ": " << otherEdges[otherEdges[rings[i][k].position][h].point2.position][j].weight << endl;
-            }
-
-
-        }*/
-
-        stellarObjects.push_back(tempBody);
-
-        //cout << tempBody.radius << endl;
 
 
     }
@@ -714,16 +715,24 @@ int GameSpace::calculateGravity(Edge temp) {
 
     float totalGrav = 0;
 
-    for (int i = 0; i < stellarObjects.size(); i++) {
+    cout << "\n\n\n\n";
+
+    cout << "RING COUNT: " << ringCount << "\n";
+    //cout << "STELLAROBJECTS SIZE: " << stellarObjects.size() << "\n";
+    cout << "CELESTIALOBJECTS SIZE: " << celestialObjects.size();
+
+    cout << "\n\n\n\n";
+
+    for (int i = 0; i < celestialObjects.size(); i++) {
         float grav;
 
 
-        float d1 = sqrt((pow((stellarObjects[i].xcoord - temp.point1.xcoord), 2)) + (pow((stellarObjects[i].ycoord - temp.point1.ycoord), 2)));
-        float d2 = sqrt((pow((stellarObjects[i].xcoord - temp.point2.xcoord), 2)) + (pow((stellarObjects[i].ycoord - temp.point2.ycoord), 2)));
+        float d1 = sqrt((pow((celestialObjects[i].getX() - temp.point1.xcoord), 2)) + (pow((celestialObjects[i].getY() - temp.point1.ycoord), 2)));
+        float d2 = sqrt((pow((celestialObjects[i].getX() - temp.point2.xcoord), 2)) + (pow((celestialObjects[i].getY() - temp.point2.ycoord), 2)));
 
         if (temp.point2.ring == temp.point1.ring) {
             int ave = (d1 + d2) / 2;
-            grav = (.087 * 10 * stellarObjects[i].mass) / (ave);
+            grav = (.087 * 10 * celestialObjects[i].getMass()) / (ave);
             totalGrav = totalGrav + grav;
             continue;
         }
@@ -732,11 +741,11 @@ int GameSpace::calculateGravity(Edge temp) {
 
         
         else if (d2 > d1) {
-            grav = (.087 * 10 * stellarObjects[i].mass) / (d2 + 50);
+            grav = (.087 * 10 * celestialObjects[i].getMass()) / (d2 + 50);
         }
 
         else {
-            grav = (.037 * 10 * stellarObjects[i].mass*-1) / (d2 + 50);
+            grav = (.037 * 10 * celestialObjects[i].getMass() *-1) / (d2 + 50);
         }
 
         totalGrav = totalGrav + grav;
