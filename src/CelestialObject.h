@@ -25,7 +25,8 @@ struct StellarBody {
 
 };
 
-enum class CelstialType {
+enum class CelestialType {
+	DEFAULT,
 	TERRA,
 	SUPERPLANET,
 	GASGIANT,
@@ -43,7 +44,7 @@ public:
 	void chooseTexture();
 
 	void update(float dt);
-	void draw(sf::RenderWindow& window);
+	void drawCelest(sf::RenderWindow& window);
 
 	float getMass() const { return mass; }
 	float getRadius() const { return radius; }
@@ -60,6 +61,8 @@ private:
 	float radius;
 	float mass;
 	float gravity;
+	bool rings = false;
+	//CelestialType type = DEFAULT;
 
 	int idx = 0;
 	float anim_timer = 0;

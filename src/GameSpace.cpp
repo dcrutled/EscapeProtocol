@@ -1,6 +1,7 @@
 #include <iostream>
 #include "GameSpace.h"
 #include "CelestialObject.h"
+#include "Player.h"
 #include <cmath>
 #include <vector>
 #include <string>
@@ -70,11 +71,34 @@ void GameSpace::loadAssets() {
         if (texture->loadFromFile(entry.path().string())) {
             planets.push_back(std::move(texture));
         }
-        //auto texture = std::make_unique<sf::Texture>();
-        //planet_sheet.loadFromFile(entry.path().string());
-       // planets.push_back(move(planet_sheet));
+      
     }
 
+
+    for (auto& entry : filesystem::directory_iterator("assets/Gas Giants/")) {
+
+        // auto planet_sheet = make_unique<sf::Texture>();;
+        auto texture = std::make_unique<sf::Texture>();
+        if (texture->loadFromFile(entry.path().string())) {
+            gasGiants.push_back(std::move(texture));
+        }
+      
+    }
+
+    for (auto& entry : filesystem::directory_iterator("assets/Stars/")) {
+
+        // auto planet_sheet = make_unique<sf::Texture>();;
+        auto texture = std::make_unique<sf::Texture>();
+        if (texture->loadFromFile(entry.path().string())) {
+            stars.push_back(std::move(texture));
+        }
+
+    }
+
+
+    playerTex.loadFromFile("assets/Player/Spike_SpriteSheet.png");
+
+    player = std::make_unique<Player>(playerTex);
 
 }
 
@@ -88,6 +112,7 @@ GameSpace::GameSpace(int ringCount) {
     int vertices = points.size();
     set_vertices(vertices);
     createEdges();
+    makeBackground();
     createObstacles();
     bellmanFord();
     testShowStuff();
@@ -95,6 +120,174 @@ GameSpace::GameSpace(int ringCount) {
     drawMap();
     makeBackground();
    
+
+}
+
+void GameSpace::inputParse(sf::RenderWindow& window, sf::View& view) {
+
+    while (const std::optional event = window.pollEvent())
+    {
+
+        //------------------------------------------------------------------------
+
+
+        if (const auto* scroll = event->getIf<sf::Event::MouseWheelScrolled>())
+        {
+            // Convert mouse pixel position to world coordinates
+            sf::Vector2f mouseWorld = window.mapPixelToCoords(sf::Mouse::getPosition(window), view);
+
+            float zoomFactor = (scroll->delta > 0) ? 0.9f : 1.1f;
+
+            if (view.getSize().x > 4000 && view.getSize().y > 2500) {
+                zoomFactor = (scroll->delta > 0) ? 0.9f : 1.0;
+            }
+
+
+            view.zoom(zoomFactor);
+
+            // After zooming, shift the view center toward the mouse position
+            sf::Vector2f newMouseWorld = window.mapPixelToCoords(sf::Mouse::getPosition(window), view);
+            view.move(mouseWorld - newMouseWorld);
+
+            window.setView(view);
+        }
+
+
+        //------------------------------------------------------------------------
+
+        if (const auto* click = event->getIf<sf::Event::MouseButtonPressed>())
+        {
+            // Convert mouse pixel position to world coordinates
+            sf::Vector2f mouseWorld = window.mapPixelToCoords(sf::Mouse::getPosition(window), view);
+
+            /*
+
+            for (auto& point : points) {
+
+
+                if (abs(mouseWorld.x - point.xcoord) < 10 && abs(mouseWorld.y - point.ycoord) < 10) {
+
+                    if (player->getPoint().ring <= point.ring && abs(player->getPoint().ring - point.ring) <= 1) {
+                        player->newLocation(point.xcoord, point.ycoord);
+
+                        player->turnShip();
+
+                        player->setPoint(point);
+                    }
+                }
+
+
+            }
+            */
+
+            float clickDistance = sqrt((pow((mouseWorld.x - player->getPoint().xcoord), 2)) + (pow((mouseWorld.y - player->getPoint().ycoord), 2)));
+
+            for (auto& edge : otherEdges) {
+
+                for (int i = 0; i < edge.size(); i++) {
+
+                    if (edge[i].point1.xcoord == player->getPoint().xcoord && edge[i].point1.ycoord == player->getPoint().ycoord) {
+
+                        //std::cout << "Passed the same start check.\n";
+
+                        float checkDistance = sqrt((pow((edge[i].point2.xcoord - player->getPoint().xcoord), 2)) + (pow((edge[i].point2.ycoord - player->getPoint().ycoord), 2)));
+
+                        if (abs(checkDistance - clickDistance) <= 20 
+                            && (abs(mouseWorld.x - edge[i].point2.xcoord) < 10 && abs(mouseWorld.y - edge[i].point2.ycoord) < 10)
+                            && (player->getPoint().ring <= edge[i].point2.ring && abs(player->getPoint().ring - edge[i].point2.ring) <= 1)) {
+
+
+                            player->newLocation(edge[i].point2.xcoord, edge[i].point2.ycoord);
+
+                            player->turnShip();
+
+                            player->setPoint(edge[i].point2);
+
+                            break;
+
+
+                        }
+
+
+
+
+                    }
+                }
+            }
+
+
+
+            //player->newLocation(mouseWorld.x, mouseWorld.y);
+
+            //player->point();
+
+
+        }
+
+
+        //------------------------------------------------------------------------
+
+
+        if (event->is<sf::Event::Closed>())
+            window.close();
+    }
+
+
+
+
+
+
+
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+        if (view.getCenter().y < -500.f) {
+            view.move({ 0,0 });
+            //window.setView(view);
+        }
+        else {
+            view.move({ 0, -2.f });
+            //window.setView(view);
+        }
+
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+        if (view.getCenter().y > 500.f) {
+            view.move({ 0,0 });
+            //window.setView(view);
+        }
+        else {
+            view.move({ 0, 2.f });
+            //window.setView(view);
+        }
+
+
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+        if (view.getCenter().x < -500.f) {
+            view.move({ 0,0 });
+            //window.setView(view);
+        }
+        else {
+            view.move({ -2.f, 0 });
+            //window.setView(view);
+        }
+
+
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+        if (view.getCenter().x > 500.f) {
+            view.move({ 0,0 });
+            //window.setView(view);
+        }
+        else {
+            view.move({ 2.f, 0 });
+            //window.setView(view);
+        }
+    }
+
 
 }
 
@@ -134,6 +327,7 @@ void GameSpace::createPointsAndRings(int ringCount) {
             point.ring = 0;
             point.radius = 0;
             point.theta = 0;
+            
             //points.push_back(vector<Point>());
             points.push_back(point);
             rings[0].push_back(point);
@@ -207,6 +401,7 @@ void GameSpace::createPointsAndRings(int ringCount) {
     }
     
     makeCartesian();
+    player->setPoint(points[0]);
     
     //END OF FOR LOOP FOR POINT CREATION ----------------- UNCOMMENT BLOCK BELOW IF YOU WANT TO CHECK INDIVIDUAL POINT COORDINATES
     /*
@@ -474,18 +669,60 @@ void GameSpace::update(float dt) {
         obj.update(dt);
     }
 
+    player->update(dt);
+
+    for (auto& star : middleStars) {
+        star.twinkleTimer += dt;
+    }
+
+    for (auto& star : nearStars) {
+        star.twinkleTimer += dt;
+    }
+
+
 }
+
+
 
 void GameSpace::draw(sf::RenderWindow& window)
 {
 
 
     window.draw(map);
+    window.draw(farStars);
 
-   
+    for (auto& star : middleStars) {
+        /*
+
+        if (star.twinkleTimer >= star.twinkleSpeed) {
+            int alphaValue = rand() % 256;
+            star.shape.setFillColor({ 255, 255, 255, static_cast<uint8_t>(alphaValue) });
+            star.twinkleTimer = 0;
+            
+            }
+        */
+        float alpha = 177.5f + sin(star.twinkleTimer * star.twinkleSpeed) * 77.5f;
+        star.shape.setFillColor({ 255, 255, 255, static_cast<uint8_t>(alpha) });
+        window.draw(star.shape);
+    }
+    for (auto& star : nearStars) {
+        /*
+        if (star.twinkleTimer >= star.twinkleSpeed) {
+
+            int alphaValue = rand() % 256;
+            star.shape.setFillColor({ 255, 255, 255, static_cast<uint8_t>(alphaValue) });
+            star.twinkleTimer = 0;
+
+        }
+        */
+        float alpha = 177.5f + sin(star.twinkleTimer * star.twinkleSpeed) * 77.5f;
+        star.shape.setFillColor({ 255, 255, 255, static_cast<uint8_t>(alpha) });
+        window.draw(star.shape);
+    }
+
 
     for (auto& obj : celestialObjects) {
-        obj.draw(window);
+        obj.drawCelest(window);
         //sf::CircleShape debugDot(10.f);
         //debugDot.setFillColor(sf::Color::Red);
         //debugDot.setOrigin(sf::Vector2f(9.5f, 9.f));
@@ -493,12 +730,16 @@ void GameSpace::draw(sf::RenderWindow& window)
         //window.draw(debugDot);
     }
 
+    
+    
+
+
     sf::CircleShape debugDot(10.f);
     debugDot.setFillColor(sf::Color::Red);
     debugDot.setRadius(10);
     debugDot.setOrigin(sf::Vector2f(10, 10));
-    debugDot.setPosition(sf::Vector2f(0, 0));
-    window.draw(debugDot);
+    debugDot.setPosition(sf::Vector2f(0, 600));
+    //window.draw(debugDot);
     
    
     for (int i = 0; i < points.size(); i++) {
@@ -534,6 +775,7 @@ void GameSpace::draw(sf::RenderWindow& window)
         window.draw(text);
         window.draw(text);
     }
+    player->drawPlayer(window);
 
     for (int i = 0; i < otherEdges.size(); i++) {
 
@@ -603,13 +845,41 @@ void GameSpace::createObstacles() {
 
 
         
-        float mass = rand() % 10000;
+        float mass = rand() % 10001;
+
+        
+
+        if (mass <= 2500) {
+            const sf::Texture& tex = *planets[rand() % planets.size()];
+            CelestialObject body(xcoord, ycoord, mass, tex);
+            celestialObjects.push_back(body);
+        }
+
+        else if (mass > 2500 && mass <= 5000) {
+            const sf::Texture& tex = *planets[rand() % planets.size()];
+            CelestialObject body(xcoord, ycoord, mass, tex);
+            celestialObjects.push_back(body);
+        }
+
+        else if (mass > 5000 && mass <= 8000) {
+            const sf::Texture& tex = *gasGiants[rand() % gasGiants.size()];
+            CelestialObject body(xcoord, ycoord, mass, tex);
+            celestialObjects.push_back(body);
+        }
+
+        else if (mass > 8000 && mass <= 10000) {
+            const sf::Texture& tex = *stars[rand() % stars.size()];
+            CelestialObject body(xcoord, ycoord, mass, tex);
+            celestialObjects.push_back(body);
+        }
+
+        
 
         //sf::Texture tex = planets[rand() % planets.size() + 1];
-        const sf::Texture& tex = *planets[rand() % planets.size()];
+        //const sf::Texture& tex = *planets[rand() % planets.size()];
 
-        CelestialObject body(xcoord, ycoord, mass, tex);
-        celestialObjects.push_back(body);
+       // CelestialObject body(xcoord, ycoord, mass, tex);
+        //celestialObjects.push_back(body);
 
 
 
@@ -715,13 +985,13 @@ int GameSpace::calculateGravity(Edge temp) {
 
     float totalGrav = 0;
 
-    cout << "\n\n\n\n";
+    //cout << "\n\n\n\n";
 
-    cout << "RING COUNT: " << ringCount << "\n";
+    //cout << "RING COUNT: " << ringCount << "\n";
     //cout << "STELLAROBJECTS SIZE: " << stellarObjects.size() << "\n";
-    cout << "CELESTIALOBJECTS SIZE: " << celestialObjects.size();
+    //cout << "CELESTIALOBJECTS SIZE: " << celestialObjects.size();
 
-    cout << "\n\n\n\n";
+    //cout << "\n\n\n\n";
 
     for (int i = 0; i < celestialObjects.size(); i++) {
         float grav;
@@ -813,11 +1083,55 @@ void GameSpace::bellmanFord() {
 
 void GameSpace::makeBackground() {
 
-    //sf::Texture texture;
-    //if (!texture.loadFromFile("assets/background/background_1.png")) {
-        // handle error
-    //}
+    farStars = sf::VertexArray(sf::PrimitiveType::Points);
 
-    //background.setTexture(texture);
+    for (int i = 0; i < 800; i++) {
+        
+        sf::Vertex v;
+        float x = (rand() % 6000) - 3000;
+        float y = (rand() % 4500) - 2250;
+
+        v.position = sf::Vector2f(x,y);
+
+        farStars.append(v);
+
+    }
+
+
+    for (int i = 0; i < 300; i++) {
+
+        Star star;
+
+        
+
+        star.shape.setRadius(1.0f);
+
+        float x = (rand() % 6000) - 3000;
+        float y = (rand() % 4500) - 2250;
+
+        star.shape.setPosition({ x, y });
+
+        middleStars.push_back(star);
+
+    }
+
+
+    for (int i = 0; i < 200; i++) {
+
+        Star star;
+
+        
+
+        star.shape.setRadius(2.0f);
+
+        float x = (rand() % 6000) - 3000;
+        float y = (rand() % 4500) - 2250;
+
+        star.shape.setPosition({ x, y });
+
+        nearStars.push_back(star);
+
+    }
+
 
 }

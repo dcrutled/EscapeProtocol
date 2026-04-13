@@ -14,7 +14,7 @@ FetchContent_MakeAvailable(SFML)
 
 add_executable(main src/main.cpp
                     src/GameSpace.cpp
-                    src/GameSpace.h "src/CelestialObject.h" "src/CelestialObject.cpp")
+                    src/GameSpace.h "src/CelestialObject.h" "src/CelestialObject.cpp" "src/Player.cpp" "src/Player.h" "src/Point.h")
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics)
 

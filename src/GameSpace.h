@@ -4,10 +4,12 @@
 #include <vector>
 #include <limits>
 #include "CelestialObject.h"
+#include "Player.h"
+#include "Point.h"
 #include <SFML/Graphics.hpp>
 
 using namespace std;
-
+/*
 struct Point {
     string name;
     int position;
@@ -17,7 +19,7 @@ struct Point {
     float xcoord;
     float ycoord;
 };
-
+*/
 struct Edge {
     Point point1;
     Point point2;
@@ -31,6 +33,12 @@ struct Edge {
 struct ShortestPath {
     double distance = numeric_limits<double>::infinity();
     int parent = -1;
+};
+
+struct Star {
+    sf::CircleShape shape;
+    float twinkleTimer = 0.f;
+    float twinkleSpeed = (rand() % 300) / 100.f;
 };
 
 
@@ -67,6 +75,7 @@ public:
     void polarDistance(struct Point, struct Point);
 
     void draw(sf::RenderWindow& window);
+    void inputParse(sf::RenderWindow& window, sf::View&);
 
     void update(float dt);
 
@@ -76,6 +85,10 @@ public:
     void testShowStuff();
 
     void loadAssets();
+
+    
+    
+   
    
 
 
@@ -89,16 +102,30 @@ private:
     vector<vector<int>> edges;
     vector<vector<Edge>> otherEdges;
 
-    sf::VertexArray map;
-    //sf::Sprite background;
-    //sf::Texture texture;
-    //vector<StellarBody> stellarObjects;
+    //float twinkleTimer = 0.f;
+    //float twinkling = .5;
+    
 
+    std::unique_ptr<Player> player;
+
+    sf::VertexArray map;
+
+    sf::View defaultView;
+    float currentZoom;
+
+    sf::VertexArray farStars;
+    //sf::VertexArray nearStars;
+    vector<Star> middleStars;
+    vector<Star> nearStars;
+
+    sf::Texture playerTex;
 
     vector<CelestialObject> celestialObjects;
 
     //vector<sf::Texture> planets;
     vector<unique_ptr<sf::Texture>> planets;
+    vector<unique_ptr<sf::Texture>> gasGiants;
+    vector<unique_ptr<sf::Texture>> stars;
 
     vector<ShortestPath> paths;
 

@@ -18,20 +18,64 @@ CelestialObject::CelestialObject(float x, float y, float inMass, const sf::Textu
 	ycoord = y;
 	mass = inMass;
 
-	radius = pow(mass, (1.f / 2.75));
-	gravity = (.087 * mass) / radius;
+    radius = pow(mass, (1.f / 2.75));
+    gravity = (.087 * mass) / radius;
+    anim_speed = radius / 25;
+
+
+    if (inMass <= 2500) {
+        //type = CelestialType::TERRA;
+        
+        sprite.setOrigin({ 50, 50 });
+        sprite.setScale({ .03f * radius, .03f * radius });
+
+    }
+
+    else if (inMass > 2500 && inMass <= 5000) {
+        //type = CelestialType::SUPERPLANET;
+        
+        sprite.setOrigin({ 50, 50 });
+        sprite.setScale({ .03f * radius, .03f * radius });
+    }
+
+    else if (inMass > 5000 && inMass <= 8000) {
+        //type = CelestialType::GASGIANT;
+        
+        if (sprite.getTexture().getSize().x == 15000) {
+            sprite.setOrigin({ 150, 150 });
+            sprite.setScale({ .028f * radius, .028f * radius });
+            rings = true;
+        }
+
+        else {
+            rings = false;
+            sprite.setOrigin({ 50, 50 });
+            sprite.setScale({ .03f * radius, .03f * radius });
+        }
+    }
+
+    else if (inMass > 8000 && inMass <= 10000) {
+       // type = CelestialType::STAR;
+        
+        sprite.setOrigin({ 100, 100 });
+        sprite.setScale({ .033f * radius, .033f * radius });
+    }
+
+	
+
+
 
  
-    anim_speed = radius / 32;
-
-    sprite.setScale({ .03f * radius, .03f * radius });
+    //anim_speed = radius / 32;
+       
+    //sprite.setScale({ .03f * radius, .03f * radius });
 
    
-    //sprite.setOrigin(sprite.getLocalBounds().size/10000.0f);
+    
  
-    sprite.setOrigin({ radius + 30, radius + 30 });
+    //sprite.setOrigin({ 50, 50 });
 
-    //sprite.setScale({ .03f * radius, .03f * radius });
+    
 
  
     sprite.setPosition({xcoord, ycoord});
@@ -71,17 +115,41 @@ void CelestialObject::update(float dt) {
         idx = (idx + 1) % 50;
     }
 
-    }
+}
 
-void CelestialObject::draw(sf::RenderWindow& window) {
+void CelestialObject::drawCelest(sf::RenderWindow& window) {
 
         //update();
 
-
-
+    if (mass <= 2500) {
+        //type = CelestialType::TERRA;
         sprite.setTextureRect(sf::IntRect({ idx * 100,0 }, { 100,100 }));
+    }
+
+    else if (mass > 2500 && mass <= 5000) {
+        //type = CelestialType::SUPERPLANET;
+        sprite.setTextureRect(sf::IntRect({ idx * 100,0 }, { 100,100 }));
+    }
+
+    else if (mass > 5000 && mass <= 8000) {
+        //type = CelestialType::GASGIANT;
+        if (rings) {
+            sprite.setTextureRect(sf::IntRect({ idx * 300,0 }, { 300,300 }));
+        }
+
+        else{ sprite.setTextureRect(sf::IntRect({ idx * 100,0 }, { 100,100 })); }
+    }
+
+    else if (mass > 8000 && mass <= 10000) {
+        // type = CelestialType::STAR;
+        sprite.setTextureRect(sf::IntRect({ idx * 200,0 }, { 200,200 }));
+    }
 
 
+    
+        //sprite.setTextureRect(sf::IntRect({ idx * 100,0 }, { 100,100 }));
+
+    
         window.draw(sprite);
   
 }

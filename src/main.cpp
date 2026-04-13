@@ -14,10 +14,10 @@ using namespace std;
 
 int main()
 {
-
+/*
     vector<sf::Texture> planets;
 
-    for (auto& entry : filesystem::directory_iterator("assets/Planets/")) {
+    for (auto& entry : filesystem::directory_iterator("assets/Gas Giants/")) {
 
         sf::Texture planet_sheet;
         planet_sheet.loadFromFile(entry);
@@ -31,17 +31,17 @@ int main()
     if (!planet_sheet.loadFromFile("assets/Planets/blue_cloudy_water_planet.png")) {
         cout << "ERROR" << endl;
     }
-    */
+    
 
 
-    sf::Sprite planet(planets[3]);
+    sf::Sprite planet(planets[2]);
 
     planet.setPosition({ 100.0f, 100.0f });
 
     
-    //planet.setTextureRect(sf::IntRect({0,0},{100,100}));
+    planet.setTextureRect(sf::IntRect({0,0},{300,300}));
 
-
+    */
 
 
 
@@ -87,16 +87,23 @@ int main()
     }
 
     GameSpace g(rings);
+    sf::VideoMode userScreen = sf::VideoMode::getDesktopMode();
 
-
-    sf::RenderWindow window(sf::VideoMode({ 1920, 1080 }), "SFML works!");
+    sf::RenderWindow window(userScreen, "Solar System Escape");
+    
+    //sf::RenderWindow window(sf::VideoMode({ 1920, 1400 }), "SFML works!");
    //sf::CircleShape shape(100.f);
     //shape.setFillColor(sf::Color::Green);
+    // 
+    // 
+    // 
     //-------------------------------------------------------------
-    sf::View view(sf::FloatRect({ 0.f, 0.f }, { 1920.f, 1080.f }));
+    sf::View view(sf::FloatRect({ 0.f, 0.f }, { (float)userScreen.size.x, (float)userScreen.size.y }));
     view.setCenter({ 0.f, 0.f });   // center your world at (0,0)
 
     window.setView(view);
+
+    
 
     //-------------------------------------------------------------
 
@@ -108,10 +115,13 @@ int main()
 
     while (window.isOpen())
     {
-
+        //std::cout << view.getSize().x << " " << view.getSize().y << std::endl;
         float delta_time = clock.restart().asSeconds();
+        sf::View defaultView = window.getView(); // save this once after setting up your initial view
+        float currentZoom = 1.0f;
+        g.inputParse(window, view);
 
-       
+        /*
 
         while (const std::optional event = window.pollEvent())
         {
@@ -121,16 +131,26 @@ int main()
 
             if (const auto* scroll = event->getIf<sf::Event::MouseWheelScrolled>())
             {
-                
+                // Convert mouse pixel position to world coordinates
+                sf::Vector2f mouseWorld = window.mapPixelToCoords(sf::Mouse::getPosition(window), view);
 
-                if (scroll->delta > 0)
-                    view.zoom(0.9f);
-                else
-                    view.zoom(1.1f);
+                float zoomFactor = (scroll->delta > 0) ? 0.9f : 1.1f;
+
+                if (view.getSize().x > 4000 && view.getSize().y > 2500) {
+                    zoomFactor = (scroll->delta > 0) ? 0.9f : 1.0;
+                }
+
+
+                view.zoom(zoomFactor);
+
+                // After zooming, shift the view center toward the mouse position
+                sf::Vector2f newMouseWorld = window.mapPixelToCoords(sf::Mouse::getPosition(window), view);
+                view.move(mouseWorld - newMouseWorld);
 
                 window.setView(view);
             }
 
+    
             //------------------------------------------------------------------------
 
 
@@ -139,16 +159,64 @@ int main()
         }
 
 
-        anim_timer += delta_time;
 
-        if (anim_timer >= anim_speed) {
-            anim_timer = 0;
-            idx = (idx + 1) % 50;
-        }
 
         
 
-        planet.setTextureRect(sf::IntRect({ idx * 100,0 }, { 100,100 }));
+        
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+            if (view.getCenter().y < -500.f) {
+                view.move({ 0,0 });
+                //window.setView(view);
+            }
+            else {
+                view.move({ 0, -2.f });
+                //window.setView(view);
+            }
+
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+            if (view.getCenter().y > 500.f) {
+                view.move({ 0,0 });
+                //window.setView(view);
+            }
+            else {
+                view.move({ 0, 2.f });
+                //window.setView(view);
+            }
+
+
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+            if (view.getCenter().x < -500.f) {
+                view.move({ 0,0 });
+                //window.setView(view);
+            }
+            else {
+                view.move({ -2.f, 0 });
+                //window.setView(view);
+            }
+
+
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+            if (view.getCenter().x > 500.f) {
+                view.move({ 0,0 });
+                //window.setView(view);
+            }
+            else {
+                view.move({ 2.f, 0 });
+                //window.setView(view);
+            }
+        }
+
+        */
+        
+        window.setView(view);
 
         window.clear();
         g.update(delta_time);
