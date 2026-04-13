@@ -5,6 +5,7 @@
 #include <limits>
 #include "CelestialObject.h"
 #include "Player.h"
+#include "Enemy.h"
 #include "Point.h"
 #include <SFML/Graphics.hpp>
 
@@ -107,6 +108,7 @@ private:
     
 
     std::unique_ptr<Player> player;
+    std::unique_ptr<Enemy> enemy;
 
     sf::VertexArray map;
 
@@ -119,6 +121,7 @@ private:
     vector<Star> nearStars;
 
     sf::Texture playerTex;
+    sf::Texture enemyTex;
 
     vector<CelestialObject> celestialObjects;
 

@@ -100,6 +100,12 @@ void GameSpace::loadAssets() {
 
     player = std::make_unique<Player>(playerTex);
 
+
+
+    enemyTex.loadFromFile("assets/Enemy/Alien Frigate.png");
+
+    enemy = std::make_unique<Enemy>(enemyTex);
+
 }
 
 
@@ -112,6 +118,7 @@ GameSpace::GameSpace(int ringCount) {
     int vertices = points.size();
     set_vertices(vertices);
     createEdges();
+    
     makeBackground();
     createObstacles();
     bellmanFord();
@@ -402,6 +409,10 @@ void GameSpace::createPointsAndRings(int ringCount) {
     
     makeCartesian();
     player->setPoint(points[0]);
+    enemy->setPoint(rings[ringCount-1][rand() % rings[ringCount-1].size()]);
+    enemy->placeEnemy();
+
+    
     
     //END OF FOR LOOP FOR POINT CREATION ----------------- UNCOMMENT BLOCK BELOW IF YOU WANT TO CHECK INDIVIDUAL POINT COORDINATES
     /*
@@ -670,6 +681,7 @@ void GameSpace::update(float dt) {
     }
 
     player->update(dt);
+    enemy->update(dt);
 
     for (auto& star : middleStars) {
         star.twinkleTimer += dt;
@@ -730,16 +742,21 @@ void GameSpace::draw(sf::RenderWindow& window)
         //window.draw(debugDot);
     }
 
-    
-    
+    auto& ring = rings[ringCount - 1];
 
+    for (int i = 0; i < std::min(5, (int)ring.size()); i++) {
+        std::cout << ring[i].xcoord << ", " << ring[i].ycoord << std::endl;
+    }
+    
+    Point testP = rings[ringCount][rand() % rings[ringCount].size()];
+    std::cout << "\n\n" << testP.xcoord << "      " << testP.ycoord << "\n\n";
 
     sf::CircleShape debugDot(10.f);
     debugDot.setFillColor(sf::Color::Red);
     debugDot.setRadius(10);
     debugDot.setOrigin(sf::Vector2f(10, 10));
-    debugDot.setPosition(sf::Vector2f(0, 600));
-    //window.draw(debugDot);
+    debugDot.setPosition(sf::Vector2f(0,0));
+    window.draw(debugDot);
     
    
     for (int i = 0; i < points.size(); i++) {
@@ -776,6 +793,7 @@ void GameSpace::draw(sf::RenderWindow& window)
         window.draw(text);
     }
     player->drawPlayer(window);
+    enemy->drawEnemy(window);
 
     for (int i = 0; i < otherEdges.size(); i++) {
 

@@ -1,34 +1,31 @@
-#ifndef PLAYER_H
-#define PLAYER_H
+#ifndef ENEMY_H
+#define ENEMY_H
 #include <string>
 #include <vector>
 #include "Point.h"
 #include <SFML/Graphics.hpp>
 
 
+class Enemy {
 
 
-
-
-
-class Player {
 
 public:
-	Player() = default;
-	Player(const sf::Texture& tex);
 
-	void drawPlayer(sf::RenderWindow& window);
+	Enemy() = default;
+
+	Enemy(const sf::Texture& tex);
+
+	void drawEnemy(sf::RenderWindow& window);
 
 	void setPoint(Point);
 	Point getPoint();
+	void placeEnemy() { xcoord = point.xcoord; ycoord = point.ycoord; };
 
 	void newLocation(float x, float y);
-	void turnShip();
-
-	
+	void turnEnemy();
 
 	void update(float);
-
 
 
 
@@ -45,30 +42,12 @@ private:
 	float anim_timer = 0;
 	float anim_speed = 0.23;
 
-	sf::CircleShape ship;
+	sf::CircleShape enemyTest;
 
 	sf::Sprite sprite;
 
 
-
-
-
-
-
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
