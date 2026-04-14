@@ -80,7 +80,7 @@ public:
 
     void update(float dt);
 
-    void bellmanFord();
+    void bellmanFord(int);
 
 
     void testShowStuff();

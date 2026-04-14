@@ -18,7 +18,7 @@ Enemy::Enemy(const sf::Texture& tex) : sprite(tex) {
     ycoord = 0;
 
 
-    sprite.setScale({ .125, .125 });
+    sprite.setScale({ .175, .175 });
 
     sprite.setOrigin({ 256,256 });
 

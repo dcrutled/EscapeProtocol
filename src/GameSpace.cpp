@@ -121,7 +121,7 @@ GameSpace::GameSpace(int ringCount) {
     
     makeBackground();
     createObstacles();
-    bellmanFord();
+    //bellmanFord();
     testShowStuff();
     
     drawMap();
@@ -317,10 +317,12 @@ void GameSpace::polarDistance(struct Point p1, struct Point p2) { //converts pol
 void GameSpace::createPointsAndRings(int ringCount) {
 
     int j = ringCount;   
-    rings.resize(j + 1);     //ring count is resized to account for the origin point
+    //rings.resize(j + 1);     //ring count is resized to account for the origin point
     float pi = 2 * acos(0);
 
     for (int h = 0; h <= j; h++) {
+        vector<Point> tempRing;
+
 
         int k;
 
@@ -337,7 +339,9 @@ void GameSpace::createPointsAndRings(int ringCount) {
             
             //points.push_back(vector<Point>());
             points.push_back(point);
-            rings[0].push_back(point);
+            tempRing.push_back(point);
+            rings.push_back(tempRing);
+            //rings[0].push_back(point);
             continue;
         }
 
@@ -371,7 +375,8 @@ void GameSpace::createPointsAndRings(int ringCount) {
                     point.theta = (i * pi) / (pow(2, (k)));
                     //point.ring = h + 1;
                     points.push_back(point);
-                    rings[h].push_back(point);
+                    tempRing.push_back(point);
+                    //rings[h].push_back(point);
                     continue;
                 }
 
@@ -386,7 +391,8 @@ void GameSpace::createPointsAndRings(int ringCount) {
                     point.theta = 0;
                     points.push_back(point);
                     //point.ring = h + 1;
-                    rings[h].push_back(point);
+                    tempRing.push_back(point);
+                    //rings[h].push_back(point);
                     continue;
                 }
                 point.theta = points[points.size() - 1].theta + (pi) / (pow(2, (k - 1)));
@@ -394,9 +400,12 @@ void GameSpace::createPointsAndRings(int ringCount) {
 
             //point.ring = h;
             points.push_back(point);
-            rings[h].push_back(point);
+            tempRing.push_back(point);
+            //rings[h].push_back(point);
 
         }
+
+        rings.push_back(tempRing);
         //points[1].ring = 1;
         //if (points.size() > 25) points[25].ring = 5;
 
@@ -409,7 +418,8 @@ void GameSpace::createPointsAndRings(int ringCount) {
     
     makeCartesian();
     player->setPoint(points[0]);
-    enemy->setPoint(rings[ringCount-1][rand() % rings[ringCount-1].size()]);
+    int idx = rand() % rings[ringCount].size();
+    enemy->setPoint(points[rings[ringCount][idx].position]);
     enemy->placeEnemy();
 
     
@@ -742,21 +752,17 @@ void GameSpace::draw(sf::RenderWindow& window)
         //window.draw(debugDot);
     }
 
-    auto& ring = rings[ringCount - 1];
-
-    for (int i = 0; i < std::min(5, (int)ring.size()); i++) {
-        std::cout << ring[i].xcoord << ", " << ring[i].ycoord << std::endl;
-    }
+ 
     
-    Point testP = rings[ringCount][rand() % rings[ringCount].size()];
-    std::cout << "\n\n" << testP.xcoord << "      " << testP.ycoord << "\n\n";
+    //int idx = rand() % rings[ringCount].size();
+    //Point testP = points[rings[ringCount][idx].position];
 
     sf::CircleShape debugDot(10.f);
     debugDot.setFillColor(sf::Color::Red);
     debugDot.setRadius(10);
     debugDot.setOrigin(sf::Vector2f(10, 10));
-    debugDot.setPosition(sf::Vector2f(0,0));
-    window.draw(debugDot);
+    debugDot.setPosition(sf::Vector2f(0, 0));
+    //window.draw(debugDot);
     
    
     for (int i = 0; i < points.size(); i++) {
@@ -985,7 +991,7 @@ void GameSpace::testShowStuff() {
     }
 
 
-    bellmanFord();
+    bellmanFord(enemy->getPoint().position);
 
     for (int i = 0; i < paths.size(); i++) {
         cout << "Distance to: " << i << " = " << paths[i].distance << endl;
@@ -1060,11 +1066,11 @@ int GameSpace::calculateGravity(Edge temp) {
 
 
 
-void GameSpace::bellmanFord() {
+void GameSpace::bellmanFord(int loc) {
     //ShortestPath initial;
     paths.resize(points.size());
     //paths.push_back(initial);
-    paths[0].distance = 0;
+    paths[loc].distance = 0;
 
 
 
@@ -1074,16 +1080,26 @@ void GameSpace::bellmanFord() {
         for (int k = 0; k < otherEdges.size(); k++) {
 
             for (auto& e : otherEdges[k]) {
-                if (e.point2.ring >= e.point1.ring) {
-                    //cout << "Good" << endl;
 
+            
+
+
+                if (e.point1.ring <= e.point2.ring) {
+                    cout << " Enemy ring greater than player\n";
+                    //cout << "Good" << endl;
+                    /*
                     if (paths[e.point1.position].distance + e.weight < paths[e.point2.position].distance) {
                         paths[e.point2.position].distance = paths[e.point1.position].distance + e.weight;
                         paths[e.point2.position].parent = e.point1.position;
                     }
+                    */
+                    if (paths[e.point2.position].distance + e.weight < paths[e.point1.position].distance) {
+                        paths[e.point1.position].distance = paths[e.point2.position].distance + e.weight;
+                        paths[e.point1.position].parent = e.point2.position;
+                    }
 
                     else { continue; }
-                }
+                    }
 
                 else {
                     continue;
