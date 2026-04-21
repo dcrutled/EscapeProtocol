@@ -201,7 +201,7 @@ void GameSpace::inputParse(sf::RenderWindow& window, sf::View& view) {
 
                         if (abs(checkDistance - clickDistance) <= 20 
                             && (abs(mouseWorld.x - edge[i].point2.xcoord) < 10 && abs(mouseWorld.y - edge[i].point2.ycoord) < 10)
-                            && (player->getPoint().ring <= edge[i].point2.ring && abs(player->getPoint().ring - edge[i].point2.ring) <= 1)) {
+                            && (abs(player->getPoint().ring - edge[i].point2.ring) <= 1) && abs(player->getPoint().ring - edge[i].point2.ring) <= 1) {
 
 
                             player->newLocation(edge[i].point2.xcoord, edge[i].point2.ycoord);
@@ -1081,29 +1081,22 @@ void GameSpace::bellmanFord(int loc) {
 
             for (auto& e : otherEdges[k]) {
 
-            
+                float d1 = sqrt((pow((e.point1.xcoord - player->getPoint().xcoord), 2)) + (pow((e.point1.ycoord - player->getPoint().ycoord), 2)));
+                float d2 = sqrt((pow((e.point2.xcoord - player->getPoint().xcoord), 2)) + (pow((e.point2.ycoord - player->getPoint().ycoord), 2)));
+                //float d2 = sqrt((pow((celestialObjects[i].getX() - temp.point2.xcoord), 2)) + (pow((celestialObjects[i].getY() - temp.point2.ycoord), 2)));
 
 
-                if (e.point1.ring <= e.point2.ring) {
-                    cout << " Enemy ring greater than player\n";
+                if (d2 < d1) {
+                    //cout << " Enemy ring greater than player\n";
                     //cout << "Good" << endl;
-                    /*
+
                     if (paths[e.point1.position].distance + e.weight < paths[e.point2.position].distance) {
                         paths[e.point2.position].distance = paths[e.point1.position].distance + e.weight;
                         paths[e.point2.position].parent = e.point1.position;
                     }
-                    */
-                    if (paths[e.point2.position].distance + e.weight < paths[e.point1.position].distance) {
-                        paths[e.point1.position].distance = paths[e.point2.position].distance + e.weight;
-                        paths[e.point1.position].parent = e.point2.position;
-                    }
-
-                    else { continue; }
-                    }
-
-                else {
-                    continue;
+                             
                 }
+                                                
             }
         }
     }
