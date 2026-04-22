@@ -14,7 +14,7 @@ FetchContent_MakeAvailable(SFML)
 
 add_executable(main src/main.cpp
                     src/GameSpace.cpp
-                    src/GameSpace.h "src/CelestialObject.h" "src/CelestialObject.cpp" "src/Player.cpp" "src/Player.h" "src/Point.h" "src/Enemy.h" "src/Enemy.cpp")
+                    src/GameSpace.h "src/CelestialObject.h" "src/CelestialObject.cpp" "src/Player.cpp" "src/Player.h" "src/Point.h" "src/Enemy.h" "src/Enemy.cpp" "src/GameState.h" "src/StartScreen.h" "src/StartScreen.cpp" "src/Star.h" "src/LevelSelect.h" "src/LevelSelect.cpp" "src/GameOver.h" "src/GameOver.cpp")
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics)
 

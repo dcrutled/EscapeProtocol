@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Point.h"
+#include "Star.h"
 #include <SFML/Graphics.hpp>
 
 using namespace std;
@@ -30,12 +31,14 @@ struct Edge {
     //other stuff
 };
 
-
+/*
 struct ShortestPath {
     double distance = numeric_limits<double>::infinity();
     int parent = -1;
 };
+*/
 
+/*
 struct Star {
     sf::CircleShape shape;
     float twinkleTimer = 0.f;
@@ -43,15 +46,16 @@ struct Star {
 };
 
 
-
+*/
 
 
 
 class GameSpace {
 
 public:
+    GameSpace();
 
-    GameSpace(int ringCount);
+    void initialize(int ringCount);
 
     void set_vertices(int vertices);
     int get_vertices() const;
@@ -72,6 +76,7 @@ public:
     void createObstacles();
    
     int calculateGravity(Edge);
+    void updateEdgeWeights();
 
     void polarDistance(struct Point, struct Point);
 
@@ -88,16 +93,16 @@ public:
     void loadAssets();
 
     
-    
+    const sf::Font& getFont() const { return font; }
    
-   
+    bool checkGameOver() { return gameOver; }
 
 
 
 
 private:
-    int vertices;
-    int ringCount;
+    int vertices = 0;
+    int ringCount = 0;
     vector<Point> points;
     vector<vector<Point>> rings;
     vector<vector<int>> edges;
@@ -113,7 +118,7 @@ private:
     sf::VertexArray map;
 
     sf::View defaultView;
-    float currentZoom;
+    float currentZoom = 1.0f;
 
     sf::VertexArray farStars;
     //sf::VertexArray nearStars;
@@ -133,6 +138,10 @@ private:
     vector<ShortestPath> paths;
 
     sf::Font font;
+
+
+
+    bool gameOver = false;
 };
 
 

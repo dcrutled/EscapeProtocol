@@ -48,18 +48,21 @@ void Player::update(float dt) {
     if (abs(xcoord - targetX) < 1.f && abs(ycoord - targetY) < 1.f) {
         xcoord = targetX;
         ycoord = targetY;
+       
 
         targetX = 1e9;
         targetY = 1e9;
     }
 
     else if (targetX != 1e9 && targetY != 1e9) {
-        xcoord = xcoord + (targetX - xcoord) * 0.015f;
-        ycoord = ycoord + (targetY - ycoord) * 0.015f;
+       
+        xcoord = xcoord + (targetX - xcoord) * 0.02f;
+        ycoord = ycoord + (targetY - ycoord) * 0.02f;
        
     }
 
 }
+
 
 
 void Player::drawPlayer(sf::RenderWindow& window) {

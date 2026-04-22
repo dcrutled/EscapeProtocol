@@ -2,6 +2,7 @@
 #define POINT_H
 
 #include <string>
+#include <limits>
 
 
 struct Point {
@@ -14,5 +15,10 @@ struct Point {
     float ycoord;
 };
 
+
+struct ShortestPath {
+    double distance = std::numeric_limits<double>::infinity();
+    int parent = -1;
+};
 
 #endif

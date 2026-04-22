@@ -22,8 +22,17 @@ public:
 	void setPoint(Point);
 	Point getPoint();
 
+	//bool getIsMoving();
+	//bool getWasMoving();
+
+	bool Player::isMoving() const {
+		return targetX != 1e9 && targetY != 1e9;
+	}
+
 	void newLocation(float x, float y);
 	void turnShip();
+
+	 
 
 	
 
@@ -37,6 +46,9 @@ private:
 	float xcoord;
 	float ycoord;
 	Point point;
+
+	//bool isMoving = false;
+	//bool wasMoving = false;
 
 	float targetX = 1e9;
 	float targetY = 1e9;

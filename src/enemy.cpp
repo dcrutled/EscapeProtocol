@@ -31,7 +31,9 @@ Enemy::Enemy(const sf::Texture& tex) : sprite(tex) {
 
 }
 
-
+int Enemy::getMoves() {
+    return totalMoves;
+}
 
 void Enemy::update(float dt) {
 
@@ -42,17 +44,31 @@ void Enemy::update(float dt) {
         idx = (idx + 1) % 5;
     }
 
-    if (abs(xcoord - targetX) < 1.f && abs(ycoord - targetY) < 1.f) {
+    if (abs(xcoord - targetX) < 5.f && abs(ycoord - targetY) < 5.f) {
         xcoord = targetX;
         ycoord = targetY;
 
+        
+
+       
+        setPoint(nextPoint);
+
+        
+
         targetX = 1e9;
         targetY = 1e9;
+
+        if(totalMoves % 2 == 1) { moveEnemy(); }
+
+        
+
+        
     }
 
     else if (targetX != 1e9 && targetY != 1e9) {
         xcoord = xcoord + (targetX - xcoord) * 0.015f;
         ycoord = ycoord + (targetY - ycoord) * 0.015f;
+        setPoint(nextPoint);
 
     }
 
@@ -115,4 +131,90 @@ void Enemy::setPoint(Point next) {
 
 Point Enemy::getPoint() {
     return point;
+}
+
+
+void Enemy::findPlayer(const vector<ShortestPath>& paths, const vector<Point>& points, Point target) {
+
+    //Point target = 
+    //pathToPlayer.push();
+    Point current = target;
+    int next;
+
+    pathToPlayerDrawing.clear();
+    pathToPlayer.clear();
+
+    //std::cout << "findPlayer: target=" << target.position
+    //    << " enemy point=" << point.position << "\n";
+
+
+    while (current.position != point.position) {
+
+        if (paths[current.position].parent == -1) {
+           // std::cout << "  early return at " << current.position << "\n";
+            return;
+        }
+
+        pathToPlayerDrawing.push(sf::Vector2f(points[current.position].xcoord, points[current.position].ycoord));
+        //std::cout << "  pushing " << current.position << "\n";
+
+        pathToPlayer.push(points[current.position]);
+
+        next = paths[current.position].parent;
+        current = points[next];
+
+    }
+    //std::cout << "  final push (enemy): " << point.position << "\n";
+    pathToPlayerDrawing.push(sf::Vector2f(points[point.position].xcoord, points[point.position].ycoord));
+
+    //return pathPoints;
+
+}
+
+void Enemy::drawPathToPlayer(sf::RenderWindow& window) {
+
+    if (pathToPlayerDrawing.isEmpty()) return;
+
+    sf::VertexArray pathLine(sf::PrimitiveType::LineStrip);
+
+    while (!pathToPlayerDrawing.isEmpty()) {
+
+    
+
+        pathLine.append(sf::Vertex{ pathToPlayerDrawing.peek(), sf::Color::Red });
+        pathToPlayerDrawing.pop();
+    }
+
+    window.draw(pathLine);
+}
+
+
+Stack<sf::Vector2f> Enemy::getPathToPlayer() {
+    return pathToPlayerDrawing;
+
+}
+
+
+
+void Enemy::moveEnemy() {
+      
+    if (pathToPlayer.isEmpty()) return;
+
+    
+    if (targetX == 1e9 && targetY == 1e9) {
+        ++totalMoves;
+        
+        nextPoint = pathToPlayer.peek();
+        //setPoint(nextPoint);
+        targetX = nextPoint.xcoord;
+        targetY = nextPoint.ycoord;
+        
+        pathToPlayer.pop();
+        turnEnemy();
+
+        
+    }
+
+    
+    
 }

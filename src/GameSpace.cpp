@@ -63,6 +63,10 @@ bool GameSpace::checkSymmetry() const {    //checks each edge vector for each ve
 
 
 void GameSpace::loadAssets() {
+    if (!font.openFromFile("assets/fonts/JLSDataGothicC_NC.otf")) {
+        std::cout << "FAILED\n";
+    }
+
 
     for (auto& entry : filesystem::directory_iterator("assets/Planets/")) {
 
@@ -108,11 +112,26 @@ void GameSpace::loadAssets() {
 
 }
 
+GameSpace::GameSpace() {
+    loadAssets();
+    makeBackground();  // stars — cheap, looks nice as backdrop
+}
 
 
+void GameSpace::initialize(int ringCount) {
 
-GameSpace::GameSpace(int ringCount) {
-    loadAssets();//gamespace constructor
+    points.clear();
+    rings.clear();
+    edges.clear();
+    otherEdges.clear();
+    paths.clear();
+    celestialObjects.clear();
+    gameOver = false;
+
+    player = make_unique<Player>(playerTex);
+    enemy = make_unique<Enemy>(enemyTex);
+
+    //gamespace constructor
     this -> ringCount = ringCount;
     createPointsAndRings(ringCount);
     int vertices = points.size();
@@ -121,7 +140,7 @@ GameSpace::GameSpace(int ringCount) {
     
     makeBackground();
     createObstacles();
-    //bellmanFord();
+    bellmanFord(enemy->getPoint().position);
     testShowStuff();
     
     drawMap();
@@ -164,28 +183,9 @@ void GameSpace::inputParse(sf::RenderWindow& window, sf::View& view) {
 
         if (const auto* click = event->getIf<sf::Event::MouseButtonPressed>())
         {
-            // Convert mouse pixel position to world coordinates
+            
             sf::Vector2f mouseWorld = window.mapPixelToCoords(sf::Mouse::getPosition(window), view);
 
-            /*
-
-            for (auto& point : points) {
-
-
-                if (abs(mouseWorld.x - point.xcoord) < 10 && abs(mouseWorld.y - point.ycoord) < 10) {
-
-                    if (player->getPoint().ring <= point.ring && abs(player->getPoint().ring - point.ring) <= 1) {
-                        player->newLocation(point.xcoord, point.ycoord);
-
-                        player->turnShip();
-
-                        player->setPoint(point);
-                    }
-                }
-
-
-            }
-            */
 
             float clickDistance = sqrt((pow((mouseWorld.x - player->getPoint().xcoord), 2)) + (pow((mouseWorld.y - player->getPoint().ycoord), 2)));
 
@@ -209,6 +209,27 @@ void GameSpace::inputParse(sf::RenderWindow& window, sf::View& view) {
                             player->turnShip();
 
                             player->setPoint(edge[i].point2);
+
+
+                            updateEdgeWeights();
+
+
+                            bellmanFord(enemy->getPoint().position);
+                            enemy->findPlayer(paths, points, player->getPoint());
+
+                            
+                            /*
+
+                                bellmanFord(enemy->getPoint().position);
+                                enemy->findPlayer(paths, points, player->getPoint());
+                                enemy->moveEnemy();
+
+                                bellmanFord(enemy->getPoint().position);
+                                enemy->findPlayer(paths, points, player->getPoint());
+                                enemy->moveEnemy();
+
+                            */
+                            
 
                             break;
 
@@ -430,7 +451,7 @@ void GameSpace::createPointsAndRings(int ringCount) {
         cout << points[i].name << "   (" << points[i].xcoord << ", " << points[i].ycoord << ")" << endl;
     }*/
 
-    cout << points[size(points) - 1].name << "   (" << points[size(points) - 1].xcoord << ", " << points[size(points) - 1].ycoord << ")" << endl;
+    //cout << points[size(points) - 1].name << "   (" << points[size(points) - 1].xcoord << ", " << points[size(points) - 1].ycoord << ")" << endl;
 
 
 }
@@ -686,6 +707,11 @@ void GameSpace::drawMap() {
 
 void GameSpace::update(float dt) {
 
+    if (player->getPoint().xcoord == enemy->getPoint().xcoord && player->getPoint().ycoord == enemy->getPoint().ycoord) {
+        gameOver = true;
+    }
+
+
     for (auto& obj : celestialObjects) {
         obj.update(dt);
     }
@@ -700,6 +726,27 @@ void GameSpace::update(float dt) {
     for (auto& star : nearStars) {
         star.twinkleTimer += dt;
     }
+
+    static bool playerWasMoving = false;
+    bool playerIsMoving = player->isMoving();
+
+    // Player just finished moving
+   
+
+    if (playerWasMoving && !playerIsMoving) {
+        enemy->moveEnemy();
+
+        if (enemy->getMoves() % 2 == 1) {
+
+            bellmanFord(enemy->getPoint().position);
+            enemy->findPlayer(paths, points, player->getPoint());
+            enemy->moveEnemy();
+        }
+
+       
+    }
+
+    playerWasMoving = playerIsMoving;
 
 
 }
@@ -752,7 +799,6 @@ void GameSpace::draw(sf::RenderWindow& window)
         //window.draw(debugDot);
     }
 
- 
     
     //int idx = rand() % rings[ringCount].size();
     //Point testP = points[rings[ringCount][idx].position];
@@ -798,8 +844,13 @@ void GameSpace::draw(sf::RenderWindow& window)
         window.draw(text);
         window.draw(text);
     }
+
     player->drawPlayer(window);
     enemy->drawEnemy(window);
+    enemy->findPlayer(paths, points, player->getPoint());
+    enemy->drawPathToPlayer(window);
+
+
 
     for (int i = 0; i < otherEdges.size(); i++) {
 
@@ -845,9 +896,7 @@ void GameSpace::createObstacles() {
     int k;
 
 
-    if (!font.openFromFile("assets/fonts/JLSDataGothicC_NC.otf")) {
-        std::cout << "FAILED\n";
-    }
+  
 
 
     //srand(time(0));
@@ -910,6 +959,8 @@ void GameSpace::createObstacles() {
 
     }
 
+    updateEdgeWeights();
+    /*
     for (int i = 0; i < otherEdges.size(); i++) {
 
 
@@ -953,14 +1004,61 @@ void GameSpace::createObstacles() {
 
 
     }
-
+    */
 }
 
 
+void GameSpace::updateEdgeWeights() {
 
+    for (int i = 0; i < otherEdges.size(); i++) {
+
+
+        for (int k = 0; k < otherEdges[i].size(); k++) {
+
+            if (otherEdges[i][k].point2.ring < otherEdges[i][k].point1.ring) {
+                continue;
+            }
+
+            else if (otherEdges[i][k].point2.ring == otherEdges[i][k].point1.ring) {
+                int u = otherEdges[i][k].point1.position;
+                int v = otherEdges[i][k].point2.position;
+
+                if (u < v) {
+                    int w = calculateGravity(otherEdges[i][k]);
+
+                    // assign to both directions
+                    otherEdges[i][k].weight = w;
+
+                    // find reverse edge and assign same weight
+                    for (auto& e : otherEdges[v]) {
+                        if (e.point2.position == u) {
+                            e.weight = w;
+                            break;
+                        }
+                    }
+                }
+
+
+                else {
+                    continue;
+                }
+            }
+
+            else {
+                otherEdges[i][k].weight = calculateGravity(otherEdges[i][k]);
+            }
+
+
+        }
+
+
+    }
+}
 
 
 void GameSpace::testShowStuff() {
+
+    /*
 
     for (int i = 0; i < otherEdges.size(); i++) {
         cout << "Point (" << otherEdges[i][0].point1.position << ") " << endl;
@@ -987,7 +1085,7 @@ void GameSpace::testShowStuff() {
 
 
         }
-
+        
     }
 
 
@@ -999,7 +1097,7 @@ void GameSpace::testShowStuff() {
     }
 
     
-
+*/
 
 }
 
@@ -1069,6 +1167,10 @@ int GameSpace::calculateGravity(Edge temp) {
 void GameSpace::bellmanFord(int loc) {
     //ShortestPath initial;
     paths.resize(points.size());
+    for (int i = 0; i < paths.size(); i++) {
+        paths[i].distance = std::numeric_limits<double>::infinity();
+        paths[i].parent = -1;
+    }
     //paths.push_back(initial);
     paths[loc].distance = 0;
 
