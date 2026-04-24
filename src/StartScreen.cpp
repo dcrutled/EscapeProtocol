@@ -88,9 +88,9 @@ void StartScreen::draw(sf::RenderWindow& window) {
         text.setOutlineColor(sf::Color::Black);
         text.setOutlineThickness(1.f);
 
-        text.setString("Solar System Escape");
+        text.setString("Escape Protocol");
 
-        float x = 0;
+        float x = -40;
         float y = -400;
 
 

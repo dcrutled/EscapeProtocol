@@ -15,7 +15,32 @@ using namespace std;
 GameOver::GameOver(sf::Font f) {
 	font = f;
 	makeBackground();
+    makeButtons();
 }
+
+
+void GameOver::makeButtons() {
+
+
+    playAgain.setSize(sf::Vector2f(300, 150));
+    playAgain.setOutlineColor(sf::Color::Red);
+    playAgain.setOutlineThickness(2);
+    playAgain.setOrigin({ 150,75 });
+    playAgain.setPosition({ -50, -200 });
+    playAgain.setFillColor(sf::Color(255, 0, 0, 0));
+
+    quitButton.setSize(sf::Vector2f(300, 150));
+    quitButton.setOutlineColor(sf::Color::Red);
+    quitButton.setOutlineThickness(2);
+    quitButton.setOrigin({ 150,75 });
+    quitButton.setPosition({ -50, 10 });
+    quitButton.setFillColor(sf::Color(255, 0, 0, 0));
+
+
+
+
+}
+
 
 
 void GameOver::draw(sf::RenderWindow& window) {
@@ -74,14 +99,7 @@ void GameOver::draw(sf::RenderWindow& window) {
 
 
 
-    //sf::RectangleShape startButton;
 
-    playAgain.setSize(sf::Vector2f(300, 150));
-    playAgain.setOutlineColor(sf::Color::Red);
-    playAgain.setOutlineThickness(2);
-    playAgain.setOrigin({ 150,75 });
-    playAgain.setPosition({ -50, -200 });
-    playAgain.setFillColor(sf::Color(255, 0, 0, 0));
 
     window.draw(playAgain);
 
@@ -89,7 +107,7 @@ void GameOver::draw(sf::RenderWindow& window) {
 
     sf::Text start(font);
 
-    start.setCharacterSize(70);
+    start.setCharacterSize(85);
     start.setFillColor(sf::Color::Yellow);
 
     start.setOutlineColor(sf::Color::Black);
@@ -120,14 +138,7 @@ void GameOver::draw(sf::RenderWindow& window) {
 
 
 
-    //sf::RectangleShape quitButton;
 
-    quitButton.setSize(sf::Vector2f(300, 150));
-    quitButton.setOutlineColor(sf::Color::Red);
-    quitButton.setOutlineThickness(2);
-    quitButton.setOrigin({ 150,75 });
-    quitButton.setPosition({ -50, 0 });
-    quitButton.setFillColor(sf::Color(255, 0, 0, 0));
 
     window.draw(quitButton);
 
@@ -135,7 +146,7 @@ void GameOver::draw(sf::RenderWindow& window) {
 
     sf::Text quit(font);
 
-    quit.setCharacterSize(70);
+    quit.setCharacterSize(85);
     quit.setFillColor(sf::Color::Yellow);
 
     quit.setOutlineColor(sf::Color::Black);
@@ -170,6 +181,28 @@ void GameOver::draw(sf::RenderWindow& window) {
 void GameOver::inputParse(sf::RenderWindow& window, sf::View& view, GameState& state) {
     while (const std::optional event = window.pollEvent())
     {
+
+
+        sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+        if (playAgain.getGlobalBounds().contains(mousePos)) {
+            playAgain.setOutlineThickness(6);
+
+        }
+        else if (!playAgain.getGlobalBounds().contains(mousePos)) {
+            playAgain.setOutlineThickness(2);
+
+        }
+
+        if (quitButton.getGlobalBounds().contains(mousePos)) {
+            quitButton.setOutlineThickness(6);
+
+        }
+        else if (!quitButton.getGlobalBounds().contains(mousePos)) {
+            quitButton.setOutlineThickness(2);
+
+        }
+
 
 
         if (const auto* click = event->getIf<sf::Event::MouseButtonPressed>())

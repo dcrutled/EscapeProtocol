@@ -41,7 +41,7 @@ int main()
 
     sf::RenderWindow window(userScreen, "Solar System Escape");
     
-
+    sf::Vector2f defaultZoom = { (float)userScreen.size.x, (float)userScreen.size.y };
 
 
 
@@ -52,6 +52,8 @@ int main()
     view.setCenter({ 0.f, 0.f });   // center your world at (0,0)
 
     window.setView(view);
+
+    
 
     
 
@@ -126,6 +128,9 @@ int main()
 
         case GameState::GameOver:
             window.clear();
+            view.setSize(defaultZoom);
+            view.setCenter({ 0.f, 0.f });
+            window.setView(view);
             gg.inputParse(window, view, currentState);
             gg.update(delta_time);
             gg.draw(window);

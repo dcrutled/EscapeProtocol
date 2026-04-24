@@ -8,7 +8,7 @@
 
 using namespace std;
 
-
+/*
 
 struct StellarBody {
 	
@@ -32,7 +32,7 @@ enum class CelestialType {
 	GASGIANT,
 	STAR
 };
-
+*/
 
 class CelestialObject {
 	//sf::Sprite m_sprite;
