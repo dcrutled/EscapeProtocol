@@ -25,7 +25,7 @@ public:
 	//bool getIsMoving();
 	//bool getWasMoving();
 
-	bool Player::isMoving() const {
+	bool isMoving() const {
 		return targetX != 1e9 && targetY != 1e9;
 	}
 
