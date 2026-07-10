@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <limits>
+#include <cmath>
 #include "CelestialObject.h"
 #include "Player.h"
 #include "Enemy.h"
