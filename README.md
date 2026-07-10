@@ -1,5 +1,6 @@
-# Escape Protocol
+# Escape Protocol 
 [![CI](https://github.com/dcrutled/EscapeProtocol/actions/workflows/ci.yml/badge.svg)](https://github.com/dcrutled/EscapeProtocol/actions/workflows/ci.yml)
+
 A pursuit-evasion game on a dynamically directed, weighted graph, written in C++ with SFML. You play as a ship in a procedurally generated solar system, moving from point to point along the graph while a pursuer hunts you down. Every time you move, the pursuer recalculates the shortest path and adjusts course.
 
 <img width="1573" height="1290" alt="image" src="https://github.com/user-attachments/assets/f5cff70e-6498-40cf-874f-83daa649aa3d" />
