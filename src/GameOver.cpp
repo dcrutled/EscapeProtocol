@@ -5,7 +5,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Point.h"
-#include "gameOver.h"
+#include "GameOver.h"
 #include <SFML/Graphics.hpp>
 
 using namespace std;
