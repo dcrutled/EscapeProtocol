@@ -2,7 +2,8 @@ Escape Protocol
 
 A pursuit-evasion game on a dynamically directed, weighted graph, written in C++ with SFML. You play as a ship in a procedurally generated solar system, moving from point to point along the graph while a pursuer hunts you down. The pursuer always knows the shortest path to you — because it computes it.
 
-(screenshot here — a mid-game shot showing the graph and both ships)
+<img width="1573" height="1290" alt="image" src="https://github.com/user-attachments/assets/f5cff70e-6498-40cf-874f-83daa649aa3d" />
+
 
 The Pathfinding
 
