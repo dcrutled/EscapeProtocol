@@ -19,6 +19,8 @@ Player::Player(const sf::Texture& tex) : sprite(tex){
 
     xcoord = 0;
     ycoord = 0;
+
+    fuel = 10;
     
 
     sprite.setScale({ .125, .125 });
@@ -92,6 +94,8 @@ void Player::newLocation(float x, float y) {
     targetX = x;
     targetY = y;
 
+    setFuel();
+
 
 }
 
@@ -117,4 +121,14 @@ void Player::setPoint(Point next) {
 
 Point Player::getPoint() {
     return point;
+}
+
+void Player::setFuel() {
+
+    fuel = fuel - 1;
+
+}
+
+int Player::getFuel() {
+    return fuel;
 }

@@ -32,6 +32,10 @@ public:
 	void newLocation(float x, float y);
 	void turnShip();
 
+	void setFuel();
+	int getFuel();
+
+
 	 
 
 	
@@ -60,6 +64,8 @@ private:
 	sf::CircleShape ship;
 
 	sf::Sprite sprite;
+
+	int fuel;
 
 
 

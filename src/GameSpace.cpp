@@ -711,6 +711,10 @@ void GameSpace::update(float dt) {
         gameOver = true;
     }
 
+    else if (player->getFuel() == 0) {
+        gameOver = true;
+    }
+
 
     for (auto& obj : celestialObjects) {
         obj.update(dt);
