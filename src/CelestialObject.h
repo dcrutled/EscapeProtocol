@@ -34,7 +34,7 @@ enum class CelestialType {
 };
 */
 
-class CelestialObject {
+class CelestialObject { //celestial object: stars, planets, eventually black holes, wormholes, etc
 	//sf::Sprite m_sprite;
 public:
 

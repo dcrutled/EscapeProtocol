@@ -13,7 +13,7 @@
 #include <SFML/Graphics.hpp>
 
 
-class HUD {
+class HUD { //unimplemented, should eventually include fuel, hp, powerups etc
 
 public:
 

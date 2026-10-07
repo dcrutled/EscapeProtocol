@@ -5,7 +5,7 @@
 #include <limits>
 
 
-struct Point {
+struct Point { //point object for planets, stars, player, npc, etc
     std::string name;
     int position;
     int ring;

@@ -50,7 +50,7 @@ struct Star {
 
 
 
-class GameSpace {
+class GameSpace { //main Game object
 
 public:
     GameSpace();

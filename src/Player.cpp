@@ -14,7 +14,7 @@
 
 
 
-Player::Player(const sf::Texture& tex) : sprite(tex){
+Player::Player(const sf::Texture& tex) : sprite(tex){ //sprite loading and object setup for player
 
 
     xcoord = 0;
@@ -38,7 +38,7 @@ Player::Player(const sf::Texture& tex) : sprite(tex){
 
 
 
-void Player::update(float dt) {
+void Player::update(float dt) { //checking player status for drawing to screen/moving
 
     anim_timer += dt;
 
@@ -99,7 +99,7 @@ void Player::newLocation(float x, float y) {
 
 }
 
-void Player::turnShip() {
+void Player::turnShip() { //turns ship to location it is moving towards
 
     float pi = acos(-1.0);
 

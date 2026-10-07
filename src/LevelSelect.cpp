@@ -143,7 +143,7 @@ void LevelSelect::inputParse(sf::RenderWindow& window, sf::View& view, GameState
     while (const std::optional event = window.pollEvent())
     {
 
-        sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window), view);
+        sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window), view);   //all of this just makes button borders thicker if mouse is hovering over it
 
         //--------------------------------------------------------------------
 

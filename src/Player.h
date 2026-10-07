@@ -11,7 +11,7 @@
 
 
 
-class Player {
+class Player { //player object
 
 public:
 	Player() = default;
@@ -32,7 +32,7 @@ public:
 	void newLocation(float x, float y);
 	void turnShip();
 
-	void setFuel();
+	void setFuel(); //entire fuel system is WIP
 	int getFuel();
 
 

@@ -49,7 +49,7 @@ void GameOver::draw(sf::RenderWindow& window) {
 
     window.draw(farStars);
 
-    for (auto& star : middleStars) {
+    for (auto& star : middleStars) { //stars twinkling, uses sin function for timing
 
         float alpha = 177.5f + sin(star.twinkleTimer * star.twinkleSpeed) * 77.5f;
         star.shape.setFillColor({ 255, 255, 255, static_cast<uint8_t>(alpha) });
@@ -186,7 +186,7 @@ void GameOver::inputParse(sf::RenderWindow& window, sf::View& view, GameState& s
 
         sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-        if (playAgain.getGlobalBounds().contains(mousePos)) {
+        if (playAgain.getGlobalBounds().contains(mousePos)) {  //makes box borders thicker when hovering over button
             playAgain.setOutlineThickness(6);
 
         }
@@ -276,7 +276,7 @@ void GameOver::update(float dt) {
 }
 
 void GameOver::makeBackground() {
-    farStars = sf::VertexArray(sf::PrimitiveType::Points);
+    farStars = sf::VertexArray(sf::PrimitiveType::Points); //places every star
 
     for (int i = 0; i < 800; i++) {
 
@@ -291,7 +291,7 @@ void GameOver::makeBackground() {
     }
 
 
-    for (int i = 0; i < 300; i++) {
+    for (int i = 0; i < 300; i++) { //
 
         Star star;
 

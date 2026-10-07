@@ -68,7 +68,7 @@ void GameSpace::loadAssets() {
     }
 
 
-    for (auto& entry : filesystem::directory_iterator("assets/Planets/")) {
+    for (auto& entry : filesystem::directory_iterator("assets/Planets/")) { //texture loading for celestial objects
 
        // auto planet_sheet = make_unique<sf::Texture>();;
         auto texture = std::make_unique<sf::Texture>();
@@ -267,7 +267,7 @@ void GameSpace::inputParse(sf::RenderWindow& window, sf::View& view) {
 
 
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) { //WASD movement
         if (view.getCenter().y < -500.f) {
             view.move({ 0,0 });
             //window.setView(view);
@@ -320,7 +320,7 @@ void GameSpace::inputParse(sf::RenderWindow& window, sf::View& view) {
 }
 
 
-void GameSpace::polarDistance(struct Point p1, struct Point p2) { //converts polar coordinates to cartesion the computes distance
+void GameSpace::polarDistance(struct Point p1, struct Point p2) { //converts polar coordinates to cartesion then computes distance
     float x1 = p1.radius * cos(p1.theta);
     float x2 = p2.radius * cos(p2.theta);
 
@@ -367,7 +367,7 @@ void GameSpace::createPointsAndRings(int ringCount) {
         }
 
         if (h % 2 == 1) {        //determines number of points in a given ring for the loop below this
-            k = h + 1;           //rings r0: 1, r1: 4, r2: 4, r3: 8, r4: 8, r5: 16 etc (powers of 2)
+            k = h + 1;           //rings and point count r0: 1, r1: 4, r2: 4, r3: 8, r4: 8, r5: 16 etc (powers of 2)
             k = k / 2;
             k = k + 1;
         }
@@ -459,7 +459,7 @@ void GameSpace::createPointsAndRings(int ringCount) {
 
 
 
-void GameSpace::createEdges() {
+void GameSpace::createEdges() { //all of this draws the actual map based on the above points
 
     edges.resize(points.size());
 
@@ -675,7 +675,7 @@ void GameSpace::makeCartesian() {
 //----------------------------------------------------------------------------------------------------------------------------------
 
 
-void GameSpace::drawMap() {
+void GameSpace::drawMap() { //the map was created above this is what draws it
 
     
 
@@ -905,7 +905,7 @@ void GameSpace::createObstacles() {
 
     //srand(time(0));
 
-    for (int i = 1; i < ringCount; i++) {
+    for (int i = 1; i < ringCount; i++) { //we're gonna have one celestial object per ring currently but that might change
 
         
 
@@ -922,7 +922,7 @@ void GameSpace::createObstacles() {
 
 
         
-        float mass = rand() % 10001;
+        float mass = rand() % 10001; //this is where inMass comes from in the celestial objects cpp
 
         
 
@@ -1168,7 +1168,7 @@ int GameSpace::calculateGravity(Edge temp) {
 
 
 
-void GameSpace::bellmanFord(int loc) {
+void GameSpace::bellmanFord(int loc) { //homemade bellman ford, we use this because negative edge weights are possible so dijkstras breaks
     //ShortestPath initial;
     paths.resize(points.size());
     for (int i = 0; i < paths.size(); i++) {

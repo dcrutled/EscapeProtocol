@@ -53,7 +53,7 @@ void StartScreen::makeButtons() {
 
 
 
-void StartScreen::draw(sf::RenderWindow& window) {
+void StartScreen::draw(sf::RenderWindow& window) {  //drawing background stars and text
 
    
     window.draw(farStars);

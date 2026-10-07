@@ -8,7 +8,7 @@ using namespace std;
 
 
 
-template <class T> class Stack {
+template <class T> class Stack { //homemade stack structure (did this for a class)
 
     struct element {
         T data;

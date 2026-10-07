@@ -9,7 +9,7 @@
 
 
 
-Enemy::Enemy(const sf::Texture& tex) : sprite(tex) {
+Enemy::Enemy(const sf::Texture& tex) : sprite(tex) { //load enemy sprite
 
     
 
@@ -109,7 +109,7 @@ void Enemy::newLocation(float x, float y) {
 
 }
 
-void Enemy::turnEnemy() {
+void Enemy::turnEnemy() { //makes enemy ship point at player
 
     float pi = acos(-1.0);
 
@@ -171,7 +171,7 @@ void Enemy::findPlayer(const vector<ShortestPath>& paths, const vector<Point>& p
 
 }
 
-void Enemy::drawPathToPlayer(sf::RenderWindow& window) {
+void Enemy::drawPathToPlayer(sf::RenderWindow& window) { //draws shortest path to player for debugging/showcasing purposes
 
     if (pathToPlayerDrawing.isEmpty()) return;
 

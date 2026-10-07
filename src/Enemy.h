@@ -11,7 +11,7 @@ class Enemy {
 
 
 
-public:
+public: //enemy ship obbject
 
 	Enemy() = default;
 

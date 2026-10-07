@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 
-struct Star {
+struct Star {  //makes my individual star objects
 	sf::CircleShape shape;
 	float twinkleTimer = 0.f;
 	float twinkleSpeed = (rand() % 300) / 100.f;

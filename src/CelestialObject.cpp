@@ -16,14 +16,14 @@ CelestialObject::CelestialObject(float x, float y, float inMass, const sf::Textu
 
 	xcoord = x;
 	ycoord = y;
-	mass = inMass;
+	mass = inMass; //inMass value is created in GameSpace cpp
 
-    radius = pow(mass, (1.f / 2.75));
+    radius = pow(mass, (1.f / 2.75)); //radii, gravity, and spin speed values are determined by mass
     gravity = (.087 * mass) / radius;
     anim_speed = radius / 25;
 
 
-    if (inMass <= 2500) {
+    if (inMass <= 2500) { //the following determine what type of object the input is based on mass
         //type = CelestialType::TERRA;
         
         sprite.setOrigin({ 50, 50 });
